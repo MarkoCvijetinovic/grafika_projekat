@@ -37,7 +37,7 @@ bool MainController::loop() {
 
 void MainController::draw_backpack() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto backpack  = resources->model("planet");
+    auto backpack  = resources->model("backpack");
     auto shader    = resources->shader("basic");
     shader->use();
 
@@ -48,14 +48,6 @@ void MainController::draw_backpack() {
     model           = translate(model, glm::vec3(0.0f, 0.0f, -3.0f));
     model           = scale(model, glm::vec3(0.3f));
     shader->set_mat4("model", model);
-
-    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
-    shader->set_vec3("lightPos", lightPos);
-    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-    shader->set_vec3("lightColor", lightColor);
-
-    auto camera = graphics->camera();
-    shader->set_vec3("viewPos", camera->Position);
 
     backpack->draw(shader);
 }
