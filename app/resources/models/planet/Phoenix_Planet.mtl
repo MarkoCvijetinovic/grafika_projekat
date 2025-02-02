@@ -10,3 +10,6 @@ Pl 1
 Ka 1 1 1
 Kd 0.800000011920929 0.800000011920929 0.800000011920929
 Ke 0 0 0
+map_Kd Phoenix_LOD0Albedo.tga.png
+map_Bump Phoenix_LOD0_Normal.tga.png
+map_Ks Phoenix_LOD0_Metalic.tga.png

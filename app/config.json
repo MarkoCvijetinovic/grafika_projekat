@@ -4,6 +4,10 @@
       "backpack": {
         "path": "backpack/backpack.obj",
         "flip_uvs": false
+      },
+      "planet": {
+        "path": "planet/Phoenix_Planet.obj",
+        "flip_uvs": false
       }
     }
   },
