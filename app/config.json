@@ -1,12 +1,24 @@
 {
   "resources": {
     "models": {
-      "backpack": {
-        "path": "backpack/backpack.obj",
+      "planet": {
+        "path": "planet/Stylized_Planets.obj",
+        "flip_uvs": true
+      },
+      "star": {
+        "path": "star/Sun.obj",
         "flip_uvs": false
       },
-      "planet": {
-        "path": "planet/Phoenix_Planet.obj",
+      "asteroid": {
+        "path": "asteroid/rock.obj",
+        "flip_uvs": false
+      },
+      "spaceship": {
+        "path": "spaceship/scene.obj",
+        "flip_uvs": false
+      },
+      "mars": {
+        "path": "mars/planet.obj",
         "flip_uvs": false
       }
     }

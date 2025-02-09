@@ -1,0 +1,508 @@
+# Aspose.3D Wavefront OBJ Exporter
+# Copyright 2004-2024 Aspose Pty Ltd.
+# File created: 02/09/2025 21:13:40
+
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl material
+	illum 2
+	Kd 1 1 1
+	Ke 0 0 0
+	Pr 0.52610517
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd material_baseColor.png
+	map_Pr material_metallicRoughness.png
+	map_Pm material_metallicRoughness.png
+	norm material_normal.png
+newmtl material
+	illum 2
+	Kd 1 1 1
+	Ke 0 0 0
+	Pr 0.52610517
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd material_baseColor.png
+	map_Pr material_metallicRoughness.png
+	map_Pm material_metallicRoughness.png
+	norm material_normal.png
+newmtl material
+	illum 2
+	Kd 1 1 1
+	Ke 0 0 0
+	Pr 0.52610517
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd material_baseColor.png
+	map_Pr material_metallicRoughness.png
+	map_Pm material_metallicRoughness.png
+	norm material_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
+newmtl 15_-_Default
+	illum 2
+	Kd 1 1 1
+	Ke 0.87080795 0.87080795 0.87080795
+	Pr 1
+	Pm 1
+	d 1
+	Tr 0
+	map_Kd 15_-_Default_baseColor.png
+	map_Ke 15_-_Default_emissive.png
+	map_Pr 15_-_Default_metallicRoughness.png
+	map_Pm 15_-_Default_metallicRoughness.png
+	norm 15_-_Default_normal.png
