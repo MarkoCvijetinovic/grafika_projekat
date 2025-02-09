@@ -23,7 +23,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Bump -bm 0.500000 Saturn_4K/Saturn2_Rings_Normal.png
+map_Bump Saturn_4K/Saturn2_Rings_Normal.png
 map_Kd Saturn_4K/Saturn2_Rings_BaseColor.png
 map_Ns Saturn_4K/Saturn2_Rings_Roughness.png
 
