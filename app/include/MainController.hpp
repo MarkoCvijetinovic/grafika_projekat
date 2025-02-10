@@ -5,6 +5,8 @@
 #ifndef MAINCONTROLLER_HPP
 #define MAINCONTROLLER_HPP
 
+#include <engine/core/Engine.hpp>
+
 class MainController : public engine::core::Controller {
 public:
     [[nodiscard]] std::string_view name() const override {
@@ -44,11 +46,15 @@ private:
 
     void initialize_asteroids();
 
+    void setSpotLight(engine::resources::Shader *shader);
+
+    void setStarLight(engine::resources::Shader *shader);
+
     unsigned int amount      = 2000;
     glm::mat4 *modelMatrices = nullptr;
 
     glm::vec3 starPos   = glm::vec3(-6.0f, 0.0f, -10.0f);
-    glm::vec3 starColor = glm::vec3(1.0f, 0.9f, 0.7f);
+    glm::vec3 starColor = glm::vec3(1.0f, 0.9f, 0.6f);
 
     glm::vec3 marsPos = glm::vec3(1.0f, 0.0f, -1.0f);
 };
