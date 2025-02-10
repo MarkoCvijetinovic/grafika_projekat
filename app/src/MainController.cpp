@@ -54,18 +54,18 @@ void MainController::draw_phoenix_planet() {
     model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
 
-    shader->set_vec3("lightPos", starPos);
-    shader->set_vec3("lightColor", starColor);
-
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
+
+    setSpotLight(shader);
+    setStarLight(shader);
 
     planet->draw(shader);
 }
 
 void MainController::draw_spaceship() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto planet    = resources->model("spaceship");
+    auto spaceship = resources->model("spaceship");
     auto shader    = resources->shader("planet");
     shader->use();
 
@@ -78,18 +78,17 @@ void MainController::draw_spaceship() {
     model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
 
-    shader->set_vec3("lightPos", starPos);
-    shader->set_vec3("lightColor", starColor);
+    setStarLight(shader);
 
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
 
-    planet->draw(shader);
+    spaceship->draw(shader);
 }
 
 void MainController::draw_mars() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto planet    = resources->model("mars");
+    auto mars      = resources->model("mars");
     auto shader    = resources->shader("mars");
     shader->use();
 
@@ -102,13 +101,13 @@ void MainController::draw_mars() {
     model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
 
-    shader->set_vec3("lightPos", starPos);
-    shader->set_vec3("lightColor", starColor);
-
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
 
-    planet->draw(shader);
+    setSpotLight(shader);
+    setStarLight(shader);
+
+    mars->draw(shader);
 }
 
 void MainController::draw_star() {
@@ -141,9 +140,17 @@ void MainController::draw_asteroid() {
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
 
-    shader->set_vec3("lightPos", starPos);
-    shader->set_vec3("lightColor", starColor);
-    shader->set_vec3("marsPos", marsPos);
+    setStarLight(shader);
+    setSpotLight(shader);
+
+    auto platform = get<engine::platform::PlatformController>();
+    float angle   = fmod((platform->frame_time().current), 18000) / 50.0f;
+
+    auto rotation = translate(glm::mat4(1.0f), marsPos);
+    rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+    rotation      = translate(rotation, -marsPos);
+
+    shader->set_mat4("rotation", rotation);
 
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
@@ -281,6 +288,31 @@ void MainController::initialize_asteroids() {
         glBindVertexArray(0);
     }
 
+}
+
+void MainController::setSpotLight(engine::resources::Shader *shader) {
+    auto graphics = get<engine::graphics::GraphicsController>();
+    auto camera   = graphics->camera();
+
+    shader->set_vec3("light.position", camera->Position);
+    shader->set_vec3("light.direction", camera->Front);
+    shader->set_float("light.cutOff", glm::cos(glm::radians(10.5f)));
+    shader->set_float("light.outerCutOff", glm::cos(glm::radians(12.5f)));
+
+    // light properties
+    shader->set_vec3("light.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+    // we configure the diffuse intensity slightly higher; the right lighting conditions differ with each lighting method and environment.
+    // each environment and lighting type requires some tweaking to get the best out of your environment.
+    shader->set_vec3("light.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    shader->set_vec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->set_float("light.constant", 1.0f);
+    shader->set_float("light.linear", 0.35f);
+    shader->set_float("light.quadratic", 0.44f);
+}
+
+void MainController::setStarLight(engine::resources::Shader *shader) {
+    shader->set_vec3("lightPos", starPos);
+    shader->set_vec3("lightColor", starColor);
 }
 
 void MainController::poll_events() {
