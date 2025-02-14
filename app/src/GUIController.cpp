@@ -7,6 +7,8 @@
 
 #include "GUIController.hpp"
 
+#include <spdlog/spdlog.h>
+
 void GUIController::initialize() {
     set_enable(false);
 }

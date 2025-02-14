@@ -46,9 +46,15 @@ private:
 
     void initialize_asteroids();
 
+    void initialize_bloom();
+
     void setSpotLight(engine::resources::Shader *shader);
 
     void setStarLight(engine::resources::Shader *shader);
+
+    void setRotation(engine::resources::Shader *shader);
+
+    void renderQuad();
 
     unsigned int amount      = 2000;
     glm::mat4 *modelMatrices = nullptr;
@@ -57,6 +63,18 @@ private:
     glm::vec3 starColor = glm::vec3(1.0f, 0.9f, 0.6f);
 
     glm::vec3 marsPos = glm::vec3(1.0f, 0.0f, -1.0f);
+
+    unsigned int hdrFBO;
+    unsigned int pingpongFBO[2];
+    unsigned int pingpongColorbuffers[2];
+    unsigned int colorBuffers[2];
+
+    unsigned int quadVAO = 0;
+    unsigned int quadVBO;
+
+    bool bloom           = true;
+    bool bloomKeyPressed = false;
+    float exposure       = 1.0f;
 };
 
 #endif //MAINCONTROLLER_HPP

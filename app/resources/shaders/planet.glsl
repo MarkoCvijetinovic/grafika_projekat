@@ -17,12 +17,17 @@ void main()
 {
     FragPos = vec3(model * vec4(aPos, 1.0));
     TexCoords = aTexCoords;
-    Normal = aNormal;
+
+    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    Normal = normalize(normalMatrix * aNormal);
+
     gl_Position = projection * view * vec4(FragPos, 1.0);
 }
 
 //#shader fragment
 #version 330 core
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
 
 struct Light {
     vec3 position;
@@ -40,8 +45,6 @@ struct Light {
 };
 
 uniform Light light;
-
-out vec4 FragColor;
 
 in vec2 TexCoords;
 in vec3 Normal;
@@ -107,5 +110,12 @@ vec3 calcSpotLight() {
 }
 
 void main() {
-    FragColor = vec4(calcPointLight() + calcSpotLight(), 1.0);
+    vec3 result = calcPointLight() + calcSpotLight();
+
+    float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
+    if (brightness > 1.0)
+    BrightColor = vec4(result, 1.0);
+    else
+    BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+    FragColor = vec4(result, 1.0);
 }
