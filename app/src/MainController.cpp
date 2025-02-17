@@ -28,7 +28,7 @@ void MainController::initialize() {
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
     engine::graphics::OpenGL::enable_depth_testing();
 
-    initialize_bloom();
+    //initialize_bloom();
     initialize_asteroids();
 }
 
@@ -89,7 +89,7 @@ void MainController::draw_spaceship() {
 
 void MainController::draw_mars() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto mars      = resources->model("mars");
+    auto mars      = resources->model("csilla");
     auto shader    = resources->shader("planet");
     shader->use();
 
@@ -170,8 +170,10 @@ void MainController::draw_asteroid() {
 }
 
 void MainController::begin_draw() {
+    /*
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    */
 
     engine::graphics::OpenGL::clear_buffers();
 }
@@ -196,6 +198,7 @@ void MainController::draw() {
 void MainController::end_draw() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    /*
     auto resources   = get<engine::resources::ResourcesController>();
     auto shaderBlur  = resources->shader("blur");
     auto shaderBloom = resources->shader("bloom");
@@ -228,6 +231,7 @@ void MainController::end_draw() {
     shaderBloom->set_bool("bloom", bloom);
     shaderBloom->set_float("exposure", exposure);
     renderQuad();
+    */
 
     auto platform = get<engine::platform::PlatformController>();
     platform->swap_buffers();
