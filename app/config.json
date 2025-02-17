@@ -17,8 +17,12 @@
         "path": "spaceship/scene.obj",
         "flip_uvs": false
       },
-      "mars": {
-        "path": "mars/planet.obj",
+      "csilla": {
+        "path": "csilla/Sun.obj",
+        "flip_uvs": false
+      },
+      "terran": {
+        "path": "terran/Sun.obj",
         "flip_uvs": false
       }
     }
