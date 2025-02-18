@@ -175,7 +175,12 @@ void MainController::draw_asteroid() {
 }
 
 void MainController::begin_draw() {
-    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    //glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    auto platform  = get<engine::platform::PlatformController>();
+    int SCR_WIDTH  = platform->window()->width();
+    int SCR_HEIGHT = platform->window()->height();
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     engine::graphics::OpenGL::clear_buffers();
 }
@@ -195,13 +200,11 @@ void MainController::draw() {
     draw_spaceship();
     draw_csilla();
     draw_terran();
-    draw_skybox();
     draw_star();
     draw_skybox();
 }
 
 void MainController::end_draw() {
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     auto resources   = get<engine::resources::ResourcesController>();
@@ -213,6 +216,7 @@ void MainController::end_draw() {
     bool horizontal     = true, first_iteration = true;
     unsigned int amount = 10;
 
+    /*
     shaderBlur->use();
     for (unsigned int i = 0; i < amount; i++) {
         glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
@@ -237,6 +241,7 @@ void MainController::end_draw() {
     glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
     shaderBloom->set_int("bloom", bloom);
     shaderBloom->set_float("exposure", exposure);
+    */
 
     //hdr
     /*
@@ -288,20 +293,17 @@ void MainController::update_camera() {
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
         bloom           = !bloom;
         bloomKeyPressed = true;
-        spdlog::info("Bloom switched");
     }
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) {
         bloomKeyPressed = false;
     }
 
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
-        spdlog::info("Exposure decreased");
         if (exposure > 0.0f)
             exposure -= 0.001f;
         else
             exposure = 0.0f;
     } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
-        spdlog::info("Exposure increased");
         exposure += 0.001f;
     }
 }
@@ -376,9 +378,10 @@ void MainController::initialize_bloom() {
     int SCR_WIDTH  = platform->window()->width();
     int SCR_HEIGHT = platform->window()->height();
 
-    auto shaderBlur   = resources->shader("blur");
-    auto shaderBloom  = resources->shader("bloom");
-    auto shaderPlanet = resources->shader("planet");
+    auto shaderBlur     = resources->shader("blur");
+    auto shaderBloom    = resources->shader("bloom");
+    auto shaderPlanet   = resources->shader("planet");
+    auto shaderAsteroid = resources->shader("asteroid");
 
     // configure (floating point) framebuffers
     // ---------------------------------------
