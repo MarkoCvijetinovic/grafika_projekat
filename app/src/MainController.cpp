@@ -216,7 +216,6 @@ void MainController::end_draw() {
     bool horizontal     = true, first_iteration = true;
     unsigned int amount = 10;
 
-    /*
     shaderBlur->use();
     for (unsigned int i = 0; i < amount; i++) {
         glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
@@ -241,7 +240,6 @@ void MainController::end_draw() {
     glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
     shaderBloom->set_int("bloom", bloom);
     shaderBloom->set_float("exposure", exposure);
-    */
 
     //hdr
     /*
