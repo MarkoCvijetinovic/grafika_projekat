@@ -28,7 +28,7 @@ void MainController::initialize() {
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
     engine::graphics::OpenGL::enable_depth_testing();
 
-    //initialize_bloom();
+    initialize_bloom();
     initialize_asteroids();
 }
 
@@ -216,7 +216,6 @@ void MainController::end_draw() {
     bool horizontal     = true, first_iteration = true;
     unsigned int amount = 10;
 
-    /*
     shaderBlur->use();
     for (unsigned int i = 0; i < amount; i++) {
         glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
@@ -230,9 +229,7 @@ void MainController::end_draw() {
             first_iteration = false;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    */
 
-    /*
     // 3. now render floating point color buffer to 2D quad and tonemap HDR colors to default framebuffer's (clamped) color range
     // --------------------------------------------------------------------------------------------------------------------------
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -243,7 +240,6 @@ void MainController::end_draw() {
     glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
     shaderBloom->set_int("bloom", bloom);
     shaderBloom->set_float("exposure", exposure);
-    */
 
     //hdr
     /*
