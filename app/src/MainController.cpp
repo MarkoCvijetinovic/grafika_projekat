@@ -175,14 +175,12 @@ void MainController::draw_asteroid() {
 }
 
 void MainController::begin_draw() {
-    /*
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
     auto platform  = get<engine::platform::PlatformController>();
     int SCR_WIDTH  = platform->window()->width();
     int SCR_HEIGHT = platform->window()->height();
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    */
 
     engine::graphics::OpenGL::clear_buffers();
 }
@@ -209,7 +207,6 @@ void MainController::draw() {
 void MainController::end_draw() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    /*
     auto resources   = get<engine::resources::ResourcesController>();
     auto shaderBlur  = resources->shader("blur");
     auto shaderBloom = resources->shader("bloom");
@@ -218,6 +215,8 @@ void MainController::end_draw() {
     // --------------------------------------------------
     bool horizontal     = true, first_iteration = true;
     unsigned int amount = 10;
+
+    /*
     shaderBlur->use();
     for (unsigned int i = 0; i < amount; i++) {
         glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
@@ -231,7 +230,9 @@ void MainController::end_draw() {
             first_iteration = false;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    */
 
+    /*
     // 3. now render floating point color buffer to 2D quad and tonemap HDR colors to default framebuffer's (clamped) color range
     // --------------------------------------------------------------------------------------------------------------------------
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -242,8 +243,19 @@ void MainController::end_draw() {
     glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
     shaderBloom->set_int("bloom", bloom);
     shaderBloom->set_float("exposure", exposure);
-    renderQuad();
     */
+
+    //hdr
+    /*
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    shaderBloom->use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+    shaderBloom->set_int("bloom", bloom);
+    shaderBloom->set_float("exposure", exposure);
+    */
+
+    renderQuad();
 
     auto platform = get<engine::platform::PlatformController>();
     platform->swap_buffers();
