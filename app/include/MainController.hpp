@@ -30,15 +30,19 @@ private:
 
     void draw_skybox();
 
-    void draw_phoenix_planet();
+    void draw_phoenix();
+
+    void draw_csilla();
+
+    void draw_terran();
+
+    void draw_spaceship();
+
+    void configure_planet();
 
     void draw_star();
 
     void draw_asteroid();
-
-    void draw_spaceship();
-
-    void draw_mars();
 
     void update_camera();
 
@@ -48,18 +52,18 @@ private:
 
     void initialize_bloom();
 
-    void setSpotLight(engine::resources::Shader *shader);
+    void set_spot_light(engine::resources::Shader *shader);
 
-    void setStarLight(engine::resources::Shader *shader);
+    void set_star_light(engine::resources::Shader *shader);
 
-    void setRotation(engine::resources::Shader *shader);
+    void set_rotation(engine::resources::Shader *shader);
 
     void renderQuad();
 
     unsigned int amount      = 2000;
     glm::mat4 *modelMatrices = nullptr;
 
-    glm::vec3 starPos   = glm::vec3(-6.0f, 0.0f, -10.0f);
+    glm::vec3 starPos   = glm::vec3(-5.0f, 0.0f, -8.0f);
     glm::vec3 starColor = glm::vec3(1.0f, 0.9f, 0.6f);
 
     glm::vec3 marsPos = glm::vec3(1.0f, 0.0f, -1.0f);
