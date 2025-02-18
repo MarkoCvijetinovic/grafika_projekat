@@ -14,6 +14,7 @@ uniform mat4 view;
 uniform mat4 projection;
 
 uniform mat4 moonRotation;
+uniform mat4 starRotation;
 
 void main()
 {
@@ -21,6 +22,12 @@ void main()
     Normal = mat3(moonRotation * aInstanceMatrix) * aNormal;
     TexCoords = aTexCoords;
     gl_Position = projection * view * moonRotation * aInstanceMatrix * vec4(aPos, 1.0);
+/*
+    FragPos = vec3(starRotation * moonRotation * aInstanceMatrix * vec4(aPos, 1.0));
+    Normal = mat3(starRotation * moonRotation * aInstanceMatrix) * aNormal;
+    TexCoords = aTexCoords;
+    gl_Position = projection * view * starRotation * moonRotation * aInstanceMatrix * vec4(aPos, 1.0);
+*/
 }
 
 //#shader fragment
