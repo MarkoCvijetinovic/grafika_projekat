@@ -1,8 +1,8 @@
 {
   "resources": {
     "models": {
-      "planet": {
-        "path": "planet/Stylized_Planets.obj",
+      "phoenix": {
+        "path": "phoenix/Stylized_Planets.obj",
         "flip_uvs": true
       },
       "star": {

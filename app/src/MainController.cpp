@@ -40,28 +40,19 @@ bool MainController::loop() {
     return true;
 }
 
-void MainController::draw_phoenix_planet() {
+void MainController::draw_phoenix() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto planet    = resources->model("planet");
+    auto phoenix   = resources->model("phoenix");
     auto shader    = resources->shader("planet");
     shader->use();
 
-    auto graphics = get<engine::graphics::GraphicsController>();
-    shader->set_mat4("projection", graphics->projection_matrix());
-    shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model = glm::mat4(1.0f);
     model           = translate(model, glm::vec3(-2.0f, 0.0f, -3.0f));
-    model           = scale(model, glm::vec3(0.6f));
+    model           = scale(model, glm::vec3(0.8f));
     model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
 
-    auto camera = graphics->camera();
-    shader->set_vec3("viewPos", camera->Position);
-
-    setSpotLight(shader);
-    setStarLight(shader);
-
-    planet->draw(shader);
+    phoenix->draw(shader);
 }
 
 void MainController::draw_spaceship() {
@@ -70,43 +61,56 @@ void MainController::draw_spaceship() {
     auto shader    = resources->shader("planet");
     shader->use();
 
-    auto graphics = get<engine::graphics::GraphicsController>();
-    shader->set_mat4("projection", graphics->projection_matrix());
-    shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model = glm::mat4(1.0f);
     model           = translate(model, marsPos + glm::vec3(0.1f, 0.2f, 1.4f));
     model           = scale(model, glm::vec3(0.001f));
     model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
 
-    setStarLight(shader);
-
-    auto camera = graphics->camera();
-    shader->set_vec3("viewPos", camera->Position);
-
     spaceship->draw(shader);
 }
 
-void MainController::draw_mars() {
+void MainController::configure_planet() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto mars      = resources->model("csilla");
     auto shader    = resources->shader("planet");
     shader->use();
 
     auto graphics = get<engine::graphics::GraphicsController>();
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
-    glm::mat4 model = glm::mat4(1.0f);
-    model           = translate(model, marsPos);
-    model           = scale(model, glm::vec3(0.1f));
-    model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    shader->set_mat4("model", model);
 
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
 
-    setSpotLight(shader);
-    setStarLight(shader);
+    set_spot_light(shader);
+    set_star_light(shader);
+    //set_rotation(shader);
+}
+
+void MainController::draw_csilla() {
+    auto resources = get<engine::resources::ResourcesController>();
+    auto mars      = resources->model("csilla");
+    auto shader    = resources->shader("planet");
+    shader->use();
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model           = translate(model, marsPos);
+    model           = scale(model, glm::vec3(0.1f));
+    shader->set_mat4("model", model);
+
+    mars->draw(shader);
+}
+
+void MainController::draw_terran() {
+    auto resources = get<engine::resources::ResourcesController>();
+    auto mars      = resources->model("terran");
+    auto shader    = resources->shader("planet");
+    shader->use();
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model           = translate(model, glm::vec3(4.0f, 0.0f, -2.0f));
+    model           = scale(model, glm::vec3(0.1f));
+    shader->set_mat4("model", model);
 
     mars->draw(shader);
 }
@@ -141,8 +145,9 @@ void MainController::draw_asteroid() {
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
 
-    setStarLight(shader);
-    setSpotLight(shader);
+    set_star_light(shader);
+    set_spot_light(shader);
+    //set_rotation(shader);
 
     auto platform = get<engine::platform::PlatformController>();
     float angle   = fmod((platform->frame_time().current), 12000) / (12000.0f / 360);
@@ -172,6 +177,10 @@ void MainController::draw_asteroid() {
 void MainController::begin_draw() {
     /*
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    auto platform  = get<engine::platform::PlatformController>();
+    int SCR_WIDTH  = platform->window()->width();
+    int SCR_HEIGHT = platform->window()->height();
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     */
 
@@ -187,10 +196,12 @@ void MainController::draw_skybox() {
 }
 
 void MainController::draw() {
-    draw_phoenix_planet();
+    configure_planet();
+    draw_phoenix();
     draw_asteroid();
     draw_spaceship();
-    draw_mars();
+    draw_csilla();
+    draw_terran();
     draw_star();
     draw_skybox();
 }
@@ -210,7 +221,8 @@ void MainController::end_draw() {
     shaderBlur->use();
     for (unsigned int i = 0; i < amount; i++) {
         glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
-        shaderBlur->set_bool("horizontal", horizontal);
+        shaderBlur->set_int("horizontal", horizontal);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1] : pingpongColorbuffers[!horizontal]);
         // bind texture of other framebuffer (or scene if first iteration)
         renderQuad();
@@ -228,7 +240,7 @@ void MainController::end_draw() {
     glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
-    shaderBloom->set_bool("bloom", bloom);
+    shaderBloom->set_int("bloom", bloom);
     shaderBloom->set_float("exposure", exposure);
     renderQuad();
     */
@@ -416,8 +428,8 @@ void MainController::initialize_bloom() {
             spdlog::error("Framebuffer not complete!");
     }
 
-    //shaderPlanet->use();
-    //shaderPlanet->set_int("texture_diffuse1", 0);
+    shaderPlanet->use();
+    shaderPlanet->set_int("texture_diffuse1", 0);
     //shaderAsteroid->use();
     //shaderAsteroid->set_int("texture_diffuse1", 0);
     shaderBlur->use();
@@ -428,7 +440,7 @@ void MainController::initialize_bloom() {
 
 }
 
-void MainController::setSpotLight(engine::resources::Shader *shader) {
+void MainController::set_spot_light(engine::resources::Shader *shader) {
     auto graphics = get<engine::graphics::GraphicsController>();
     auto camera   = graphics->camera();
 
@@ -448,18 +460,20 @@ void MainController::setSpotLight(engine::resources::Shader *shader) {
     shader->set_float("light.quadratic", 0.44f);
 }
 
-void MainController::setStarLight(engine::resources::Shader *shader) {
+void MainController::set_star_light(engine::resources::Shader *shader) {
     shader->set_vec3("lightPos", starPos);
     shader->set_vec3("lightColor", starColor);
 }
 
-void MainController::setRotation(engine::resources::Shader *shader) {
+void MainController::set_rotation(engine::resources::Shader *shader) {
     auto platform = get<engine::platform::PlatformController>();
     float angle   = fmod((platform->frame_time().current), 15000) / (15000.0f / 360);
 
     auto rotation = translate(glm::mat4(1.0f), starPos);
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
     rotation      = translate(rotation, -starPos);
+
+    //marsPos = rotation * glm::vec4(marsPos, 1.0);
 
     shader->set_mat4("starRotation", rotation);
 }
