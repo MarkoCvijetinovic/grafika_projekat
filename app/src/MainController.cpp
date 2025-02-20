@@ -178,8 +178,6 @@ void MainController::begin_draw() {
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
 
     engine::graphics::OpenGL::clear_buffers();
-
-    configure_planet();
 }
 
 void MainController::draw_skybox() {
@@ -191,6 +189,7 @@ void MainController::draw_skybox() {
 }
 
 void MainController::draw() {
+    configure_planet();
     draw_phoenix();
     draw_asteroid();
     draw_spaceship();
@@ -198,6 +197,7 @@ void MainController::draw() {
     draw_terran();
     draw_skybox();
     draw_star();
+    draw_skybox();
 }
 
 void MainController::end_draw() {
@@ -237,6 +237,16 @@ void MainController::end_draw() {
     glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
     shaderBloom->set_int("bloom", bloom);
     shaderBloom->set_float("exposure", exposure);
+
+    //hdr
+    /*
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    shaderBloom->use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+    shaderBloom->set_int("bloom", bloom);
+    shaderBloom->set_float("exposure", exposure);
+    */
 
     renderQuad();
 
@@ -287,12 +297,12 @@ void MainController::update_camera() {
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
         spdlog::info("Exposure decreased");
         if (exposure > 0.0f)
-            exposure -= 0.01f;
+            exposure -= 0.001f;
         else
             exposure = 0.0f;
     } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
         spdlog::info("Exposure increased");
-        exposure += 0.01f;
+        exposure += 0.001f;
     }
 }
 
@@ -366,11 +376,17 @@ void MainController::initialize_bloom() {
     int SCR_WIDTH  = platform->window()->width();
     int SCR_HEIGHT = platform->window()->height();
 
-    auto shaderBlur  = resources->shader("blur");
-    auto shaderBloom = resources->shader("bloom");
+    auto shaderBlur   = resources->shader("blur");
+    auto shaderBloom  = resources->shader("bloom");
+    auto shaderPlanet = resources->shader("planet");
 
+    // configure (floating point) framebuffers
+    // ---------------------------------------
+    //unsigned int hdrFBO;
     glGenFramebuffers(1, &hdrFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    // create 2 floating point color buffers (1 for normal rendering, other for brightness threshold values)
+    unsigned int colorBuffers[2];
     glGenTextures(2, colorBuffers);
     for (unsigned int i = 0; i < 2; i++) {
         glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
@@ -379,21 +395,29 @@ void MainController::initialize_bloom() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        // attach texture to framebuffer
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
     }
 
+    // create and attach depth buffer (renderbuffer)
     unsigned int rboDepth;
     glGenRenderbuffers(1, &rboDepth);
     glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, SCR_WIDTH, SCR_HEIGHT);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+    // tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
     unsigned int attachments[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
     glDrawBuffers(2, attachments);
+    // finally check if framebuffer is complete
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         spdlog::error("Framebuffer not complete!");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // ping-pong-framebuffer for blurring
+    //unsigned int pingpongFBO[2];
+    //unsigned int pingpongColorbuffers[2];
     glGenFramebuffers(2, pingpongFBO);
     glGenTextures(2, pingpongColorbuffers);
     for (unsigned int i = 0; i < 2; i++) {
@@ -402,16 +426,19 @@ void MainController::initialize_bloom() {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongColorbuffers[i], 0);
+        // also check if framebuffers are complete (no need for depth buffer)
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             spdlog::error("Framebuffer not complete!");
     }
 
     shaderPlanet->use();
     shaderPlanet->set_int("texture_diffuse1", 0);
+    //shaderAsteroid->use();
+    //shaderAsteroid->set_int("texture_diffuse1", 0);
     shaderBlur->use();
     shaderBlur->set_int("image", 0);
     shaderBloom->use();
