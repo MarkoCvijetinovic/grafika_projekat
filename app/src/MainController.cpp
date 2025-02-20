@@ -175,12 +175,7 @@ void MainController::draw_asteroid() {
 }
 
 void MainController::begin_draw() {
-    //glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
-    auto platform  = get<engine::platform::PlatformController>();
-    int SCR_WIDTH  = platform->window()->width();
-    int SCR_HEIGHT = platform->window()->height();
-    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
 
     engine::graphics::OpenGL::clear_buffers();
 }
@@ -200,11 +195,13 @@ void MainController::draw() {
     draw_spaceship();
     draw_csilla();
     draw_terran();
+    draw_skybox();
     draw_star();
     draw_skybox();
 }
 
 void MainController::end_draw() {
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     auto resources   = get<engine::resources::ResourcesController>();
@@ -291,17 +288,20 @@ void MainController::update_camera() {
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
         bloom           = !bloom;
         bloomKeyPressed = true;
+        spdlog::info("Bloom switched");
     }
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) {
         bloomKeyPressed = false;
     }
 
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
+        spdlog::info("Exposure decreased");
         if (exposure > 0.0f)
             exposure -= 0.001f;
         else
             exposure = 0.0f;
     } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
+        spdlog::info("Exposure increased");
         exposure += 0.001f;
     }
 }
@@ -376,10 +376,9 @@ void MainController::initialize_bloom() {
     int SCR_WIDTH  = platform->window()->width();
     int SCR_HEIGHT = platform->window()->height();
 
-    auto shaderBlur     = resources->shader("blur");
-    auto shaderBloom    = resources->shader("bloom");
-    auto shaderPlanet   = resources->shader("planet");
-    auto shaderAsteroid = resources->shader("asteroid");
+    auto shaderBlur   = resources->shader("blur");
+    auto shaderBloom  = resources->shader("bloom");
+    auto shaderPlanet = resources->shader("planet");
 
     // configure (floating point) framebuffers
     // ---------------------------------------
