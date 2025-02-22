@@ -56,9 +56,7 @@ private:
 
     void set_star_light(engine::resources::Shader *shader);
 
-    void set_rotation(engine::resources::Shader *shader, int speed);
-
-    void alter_star_terran();
+    void set_rotation(engine::resources::Shader *shader);
 
     unsigned int amount      = 2000;
     glm::mat4 *modelMatrices = nullptr;
@@ -66,17 +64,11 @@ private:
     glm::vec3 starPos   = glm::vec3(-5.0f, 0.0f, -8.0f);
     glm::vec3 starColor = glm::vec3(1.0f, 0.9f, 0.6f);
 
-    glm::vec3 csillaPos = glm::vec3(0.5f, 0.0f, -1.0f);
-    int csillaSpeed     = 10000;
+    glm::vec3 marsPos = glm::vec3(1.0f, 0.0f, -1.0f);
 
     bool bloom           = true;
     bool bloomKeyPressed = false;
     float exposure       = 1.5f;
-
-    glm::vec3 spotLightColor = glm::vec3(0.7f, 0.7f, 0.7f);
-    float terranScale        = 0.1f;
-    float starLuminocity     = 1.8f;
-    bool starKeyPressed      = false;
 };
 
 #endif //MAINCONTROLLER_HPP

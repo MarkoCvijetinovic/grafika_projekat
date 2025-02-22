@@ -384,13 +384,13 @@ namespace engine::graphics {
         }
     }
 
-    int32_t stbi_number_of_channels_to_gl_format(int32_t number_of_channels) {
-        switch (number_of_channels) {
+int32_t stbi_number_of_channels_to_gl_format(int32_t number_of_channels) {
+    switch (number_of_channels) {
         case 1: return GL_RED;
         case 3: return GL_RGB;
         case 4: return GL_RGBA;
         default: RG_SHOULD_NOT_REACH_HERE("Unknown channels {}", number_of_channels);
-        }
     }
+}
 
 };
