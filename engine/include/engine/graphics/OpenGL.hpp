@@ -119,34 +119,52 @@ public:
     */
     static uint32_t load_skybox_textures(const std::filesystem::path &path, bool flip_uvs = false);
 
-    /**
-    * @brief Enables depth testing.
-    */
-    static void enable_depth_testing();
+        /**
+        * @brief Enables depth testing.
+        */
+        static void enable_depth_testing();
 
-    /**
-    * @brief Disables depth testing.
-    */
-    static void disable_depth_testing();
+        /**
+        * @brief Disables depth testing.
+        */
+        static void disable_depth_testing();
 
-    /**
-    * @brief Clears GL_DEPTH_BUFFER_BIT, GL_COLOR_BUFFER_BIT, and GL_STENCIL_BUFFER_BIT.
-    */
-    static void clear_buffers();
+        /**
+        * @brief Clears GL_DEPTH_BUFFER_BIT, GL_COLOR_BUFFER_BIT, and GL_STENCIL_BUFFER_BIT.
+        */
+        static void clear_buffers();
 
-    /**
-    * @brief Retrieve the shader compilation error log message.
-    * @param shader_id Shader id for which the compilation failed.
-    * @returns shader compilation error message.
-    */
-    static std::string get_compilation_error_message(uint32_t shader_id);
+        static void begin_bloom();
 
-private:
-    /**
-    * @brief Throws an engine::util::EngineError of type @ref engine::util::EngineError::Type::OpenGLError if an OpenGL error occurred. Used internally.
-    * @param location Source location from where the OpenGL call was made.
-    */
-    static void assert_no_error(std::source_location location);
-};
+        static void initialize_bloom(int SCR_WIDTH, int SCR_HEIGHT, resources::Shader *shaderBlur,
+                                     resources::Shader *shaderBloom);
+
+        static void render_quad();
+
+        static void end_bloom(resources::Shader *shaderBlur, resources::Shader *shaderBloom, float bloom,
+                              float exposure);
+
+        /**
+        * @brief Retrieve the shader compilation error log message.
+        * @param shader_id Shader id for which the compilation failed.
+        * @returns shader compilation error message.
+        */
+        static std::string get_compilation_error_message(uint32_t shader_id);
+
+    private
+    :
+        /**
+        * @brief Throws @ref util::OpenGLError if an OpenGL error occurred. Used internally.
+        * @param location Source location from where the OpenGL call was made.
+        */
+        static void assert_no_error(std::source_location location);
+
+        static unsigned int hdrFBO;
+        static unsigned int pingpongFBO[2];
+        static unsigned int pingpongColorbuffers[2];
+        static unsigned int colorBuffers[2];
+        static unsigned int quadVAO;
+        static unsigned int quadVBO;
+    };
 }
 #endif //OPENGL_HPP
