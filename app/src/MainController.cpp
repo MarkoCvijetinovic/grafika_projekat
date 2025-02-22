@@ -178,6 +178,8 @@ void MainController::begin_draw() {
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
 
     engine::graphics::OpenGL::clear_buffers();
+
+    configure_planet();
 }
 
 void MainController::draw_skybox() {
@@ -189,7 +191,6 @@ void MainController::draw_skybox() {
 }
 
 void MainController::draw() {
-    configure_planet();
     draw_phoenix();
     draw_asteroid();
     draw_spaceship();
@@ -286,12 +287,12 @@ void MainController::update_camera() {
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
         spdlog::info("Exposure decreased");
         if (exposure > 0.0f)
-            exposure -= 0.001f;
+            exposure -= 0.01f;
         else
             exposure = 0.0f;
     } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
         spdlog::info("Exposure increased");
-        exposure += 0.001f;
+        exposure += 0.01f;
     }
 }
 
@@ -365,9 +366,8 @@ void MainController::initialize_bloom() {
     int SCR_WIDTH  = platform->window()->width();
     int SCR_HEIGHT = platform->window()->height();
 
-    auto shaderBlur   = resources->shader("blur");
-    auto shaderBloom  = resources->shader("bloom");
-    auto shaderPlanet = resources->shader("planet");
+    auto shaderBlur  = resources->shader("blur");
+    auto shaderBloom = resources->shader("bloom");
 
     glGenFramebuffers(1, &hdrFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
@@ -410,8 +410,6 @@ void MainController::initialize_bloom() {
             spdlog::error("Framebuffer not complete!");
     }
 
-    shaderPlanet->use();
-    shaderPlanet->set_int("texture_diffuse1", 0);
     shaderBlur->use();
     shaderBlur->set_int("image", 0);
     shaderBloom->use();

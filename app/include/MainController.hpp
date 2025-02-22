@@ -78,7 +78,7 @@ private:
 
     bool bloom           = true;
     bool bloomKeyPressed = false;
-    float exposure       = 1.0f;
+    float exposure       = 1.5f;
 };
 
 #endif //MAINCONTROLLER_HPP
