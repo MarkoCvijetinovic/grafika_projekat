@@ -161,17 +161,7 @@ void MainController::draw_asteroid() {
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
 
-    for (unsigned int i = 0; i < asteroid->meshes().size(); i++) {
-        glBindVertexArray(asteroid->meshes()[i].VAO());
-        for (unsigned int j = 0; j < asteroid->meshes()[i].textures().size(); j++) {
-            glActiveTexture(GL_TEXTURE0 + j);
-            glBindTexture(GL_TEXTURE_2D, asteroid->meshes()[i].textures()[j]->id());
-        }
-        glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes()[i].num_of_indices(),
-                                GL_UNSIGNED_INT,
-                                0, amount);
-        glBindVertexArray(0);
-    }
+    engine::graphics::OpenGL::draw_instanced(asteroid, amount);
 }
 
 void MainController::begin_draw() {
@@ -282,7 +272,7 @@ void MainController::initialize_asteroids() {
         float y            = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
         displacement       = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
         float z            = cos(angle) * radius + displacement;
-        model              = glm::translate(model, glm::vec3(x, y, z));
+        model              = translate(model, glm::vec3(x, y, z));
 
         // 2. scale: Scale between 0.05 and 0.25f
         float scale = static_cast<float>((rand() % 20) / 2000.0 + 0.0025);
@@ -296,34 +286,10 @@ void MainController::initialize_asteroids() {
         modelMatrices[i] = model;
     }
 
-    unsigned int buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
-
     auto resources = get<engine::resources::ResourcesController>();
     auto asteroid  = resources->model("asteroid");
 
-    for (unsigned int i = 0; i < asteroid->meshes().size(); i++) {
-        unsigned int VAO = asteroid->meshes()[i].VAO();
-        glBindVertexArray(VAO);
-        // set attribute pointers for matrix (4 times vec4)
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void *) 0);
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void *) (sizeof(glm::vec4)));
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void *) (2 * sizeof(glm::vec4)));
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void *) (3 * sizeof(glm::vec4)));
-
-        glVertexAttribDivisor(3, 1);
-        glVertexAttribDivisor(4, 1);
-        glVertexAttribDivisor(5, 1);
-        glVertexAttribDivisor(6, 1);
-
-        glBindVertexArray(0);
-    }
+    engine::graphics::OpenGL::initialize_instancing(asteroid, modelMatrices, amount);
 
 }
 
@@ -370,8 +336,6 @@ void MainController::set_rotation(engine::resources::Shader *shader) {
     auto rotation = translate(glm::mat4(1.0f), starPos);
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
     rotation      = translate(rotation, -starPos);
-
-    //marsPos = rotation * glm::vec4(marsPos, 1.0);
 
     shader->set_mat4("starRotation", rotation);
 }
