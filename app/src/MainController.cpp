@@ -350,6 +350,8 @@ void MainController::set_rotation(engine::resources::Shader *shader, int speed) 
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
     rotation      = translate(rotation, -starPos);
 
+    //marsPos = rotation * glm::vec4(marsPos, 1.0);
+
     shader->set_mat4("starRotation", rotation);
     //shader->set_mat4("starRotation", glm::mat4(1.0f));
 }
