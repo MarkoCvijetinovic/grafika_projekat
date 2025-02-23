@@ -181,11 +181,13 @@ void MainController::draw_skybox() {
 }
 
 void MainController::draw() {
+    configure_planet();
     draw_phoenix();
     draw_asteroid();
     draw_spaceship();
     draw_csilla();
     draw_terran();
+    draw_star();
     draw_skybox();
     draw_star();
 }
@@ -294,14 +296,14 @@ void MainController::initialize_asteroids() {
 }
 
 void MainController::initialize_bloom() {
-    auto resources   = get<engine::resources::ResourcesController>();
-    auto platform    = get<engine::platform::PlatformController>();
+    auto resources = get<engine::resources::ResourcesController>();
+    auto platform  = get<engine::platform::PlatformController>();
+
     auto shaderBlur  = resources->shader("blur");
     auto shaderBloom = resources->shader("bloom");
 
-    engine::graphics::OpenGL::initialize_bloom(platform->window()->width(),
-                                               platform->window()->height(), shaderBlur, shaderBloom);
-
+    engine::graphics::OpenGL::initialize_bloom(platform->window()->width(), platform->window()->height(), shaderBlur,
+                                               shaderBloom);
 }
 
 void MainController::set_spot_light(engine::resources::Shader *shader) {
@@ -336,8 +338,6 @@ void MainController::set_rotation(engine::resources::Shader *shader) {
     auto rotation = translate(glm::mat4(1.0f), starPos);
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
     rotation      = translate(rotation, -starPos);
-
-    //marsPos = rotation * glm::vec4(marsPos, 1.0);
 
     shader->set_mat4("starRotation", rotation);
 }
