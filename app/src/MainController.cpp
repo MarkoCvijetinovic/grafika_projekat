@@ -161,17 +161,7 @@ void MainController::draw_asteroid() {
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
 
-    for (unsigned int i = 0; i < asteroid->meshes().size(); i++) {
-        glBindVertexArray(asteroid->meshes()[i].VAO());
-        for (unsigned int j = 0; j < asteroid->meshes()[i].textures().size(); j++) {
-            glActiveTexture(GL_TEXTURE0 + j);
-            glBindTexture(GL_TEXTURE_2D, asteroid->meshes()[i].textures()[j]->id());
-        }
-        glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes()[i].num_of_indices(),
-                                GL_UNSIGNED_INT,
-                                0, amount);
-        glBindVertexArray(0);
-    }
+    engine::graphics::OpenGL::draw_instanced(asteroid, amount);
 }
 
 void MainController::begin_draw() {
@@ -203,8 +193,6 @@ void MainController::draw() {
 }
 
 void MainController::end_draw() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     auto resources   = get<engine::resources::ResourcesController>();
     auto shaderBlur  = resources->shader("blur");
     auto shaderBloom = resources->shader("bloom");
