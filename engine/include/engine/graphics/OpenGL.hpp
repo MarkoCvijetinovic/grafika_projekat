@@ -7,6 +7,7 @@
 #define OPENGL_HPP
 #include <cstdint>
 #include <filesystem>
+#include <engine/resources/Model.hpp>
 #include <engine/resources/Shader.hpp>
 
 namespace engine::resources {
@@ -135,13 +136,18 @@ namespace engine::graphics {
 
         static void begin_bloom();
 
-        static void initialize_bloom(int SCR_WIDTH, int SCR_HEIGHT, resources::Shader *shaderBlur,
-                                     resources::Shader *shaderBloom);
+        static void initialize_bloom(int SCR_WIDTH, int SCR_HEIGHT, const resources::Shader *shaderBlur,
+                                     const resources::Shader *shaderBloom);
 
         static void render_quad();
 
-        static void end_bloom(resources::Shader *shaderBlur, resources::Shader *shaderBloom, float bloom,
+        static void end_bloom(const resources::Shader *shaderBlur, const resources::Shader *shaderBloom, float bloom,
                               float exposure);
+
+        static void initialize_instancing(const resources::Model *model, const glm::mat4 *modelMatrices,
+                                          unsigned int amount);
+
+        static void draw_instanced(const resources::Model *model, unsigned int amount);
 
         /**
         * @brief Retrieve the shader compilation error log message.
