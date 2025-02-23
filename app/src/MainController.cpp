@@ -175,7 +175,7 @@ void MainController::draw_asteroid() {
 }
 
 void MainController::begin_draw() {
-    //glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
     auto platform  = get<engine::platform::PlatformController>();
     int SCR_WIDTH  = platform->window()->width();
     int SCR_HEIGHT = platform->window()->height();
@@ -183,6 +183,8 @@ void MainController::begin_draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     engine::graphics::OpenGL::clear_buffers();
+
+    configure_planet();
 }
 
 void MainController::draw_skybox() {
@@ -202,6 +204,7 @@ void MainController::draw() {
     draw_terran();
     draw_star();
     draw_skybox();
+    draw_star();
 }
 
 void MainController::end_draw() {
@@ -230,7 +233,9 @@ void MainController::end_draw() {
             first_iteration = false;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    */
 
+    /*
     // 3. now render floating point color buffer to 2D quad and tonemap HDR colors to default framebuffer's (clamped) color range
     // --------------------------------------------------------------------------------------------------------------------------
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
