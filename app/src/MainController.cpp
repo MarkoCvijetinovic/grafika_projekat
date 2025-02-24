@@ -49,7 +49,7 @@ void MainController::draw_phoenix() {
     glm::mat4 model = glm::mat4(1.0f);
     model           = translate(model, glm::vec3(-2.0f, 0.0f, -3.0f));
     model           = scale(model, glm::vec3(0.8f));
-    model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model           = rotate(model, glm::radians(-20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
 
     set_rotation(shader, 6000);
