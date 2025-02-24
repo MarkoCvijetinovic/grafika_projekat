@@ -70,6 +70,8 @@ private:
     bool bloom           = true;
     bool bloomKeyPressed = false;
     float exposure       = 1.5f;
+
+    glm::vec3 spotLightColor = glm::vec3(0.7f, 0.7f, 0.7f);
 };
 
 #endif //MAINCONTROLLER_HPP
