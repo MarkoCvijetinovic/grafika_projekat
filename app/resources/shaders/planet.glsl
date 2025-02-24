@@ -17,13 +17,10 @@ uniform mat4 starRotation;
 
 void main()
 {
-    FragPos = vec3(model * vec4(aPos, 1.0));
+    FragPos = vec3(starRotation * model * vec4(aPos, 1.0));
+    Normal = mat3(starRotation * model) * aNormal;
     TexCoords = aTexCoords;
-
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
-    Normal = normalize(normalMatrix * aNormal);
-
-    gl_Position = projection * view * vec4(FragPos, 1.0);
+    gl_Position = projection * view * starRotation * model * vec4(aPos, 1.0);
 }
 
 //#shader fragment
