@@ -240,23 +240,6 @@ void MainController::update_camera() {
     auto mouse = platform->mouse();
     camera->process_mouse_movement(mouse.dx, mouse.dy);
     //camera->process_mouse_scroll(mouse.scroll);
-
-    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
-        bloom           = !bloom;
-        bloomKeyPressed = true;
-    }
-    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) {
-        bloomKeyPressed = false;
-    }
-
-    if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
-        if (exposure > 0.0f)
-            exposure -= 0.001f;
-        else
-            exposure = 0.0f;
-    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
-        exposure += 0.001f;
-    }
 }
 
 void MainController::initialize_asteroids() {
@@ -322,8 +305,8 @@ void MainController::set_spot_light(engine::resources::Shader *shader) {
     shader->set_vec3("light.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
     // we configure the diffuse intensity slightly higher; the right lighting conditions differ with each lighting method and environment.
     // each environment and lighting type requires some tweaking to get the best out of your environment.
-    shader->set_vec3("light.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    shader->set_vec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->set_vec3("light.diffuse", spotLightColor);
+    shader->set_vec3("light.specular", spotLightColor);
     shader->set_float("light.constant", 1.0f);
     shader->set_float("light.linear", 0.35f);
     shader->set_float("light.quadratic", 0.44f);
@@ -351,5 +334,36 @@ void MainController::poll_events() {
     if (platform->key(engine::platform::KEY_F1).state() == engine::platform::Key::State::JustPressed) {
         cursor_enabled = !cursor_enabled;
         platform->set_enable_cursor(cursor_enabled);
+    }
+
+    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
+        bloom           = !bloom;
+        bloomKeyPressed = true;
+    }
+    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) {
+        bloomKeyPressed = false;
+    }
+
+    if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
+        if (exposure > 0.0f)
+            exposure -= 0.001f;
+        else
+            exposure = 0.0f;
+    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
+        exposure += 0.001f;
+    }
+
+    if (platform->key(engine::platform::KeyId::KEY_J).is_down()) {
+        spotLightColor[0] += 0.02f;
+    } else if (platform->key(engine::platform::KeyId::KEY_K).is_down()) {
+        spotLightColor[1] += 0.02f;
+    } else if (platform->key(engine::platform::KeyId::KEY_L).is_down()) {
+        spotLightColor[2] += 0.02f;
+    } else if (platform->key(engine::platform::KeyId::KEY_U).is_down()) {
+        spotLightColor[0] = std::max(spotLightColor[0] - 0.02f, 0.0f);
+    } else if (platform->key(engine::platform::KeyId::KEY_O).is_down()) {
+        spotLightColor[1] = std::max(spotLightColor[1] - 0.02f, 0.0f);
+    } else if (platform->key(engine::platform::KeyId::KEY_P).is_down()) {
+        spotLightColor[2] = std::max(spotLightColor[2] - 0.02f, 0.0f);
     }
 }
