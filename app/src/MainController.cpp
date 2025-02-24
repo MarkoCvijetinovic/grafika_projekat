@@ -169,7 +169,7 @@ void MainController::draw_asteroid() {
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
 
-    engine::graphics::OpenGL::draw_instanced(asteroid, m_amount);
+    engine::graphics::OpenGL::draw_instanced(asteroid, amount);
 }
 
 void MainController::begin_draw() {
@@ -182,9 +182,9 @@ void MainController::begin_draw() {
 
 void MainController::draw_skybox() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto skybox = resources->skybox("galaxy_skybox");
-    auto shader = resources->shader("skybox");
-    auto graphics = get<engine::graphics::GraphicsController>();
+    auto skybox    = resources->skybox("galaxy_skybox");
+    auto shader    = resources->shader("skybox");
+    auto graphics  = get<engine::graphics::GraphicsController>();
     graphics->draw_skybox(shader, skybox);
 }
 
@@ -201,34 +201,45 @@ void MainController::draw() {
 }
 
 void MainController::end_draw() {
-    auto resources = get<engine::resources::ResourcesController>();
-    auto shaderBlur = resources->shader("blur");
+    auto resources   = get<engine::resources::ResourcesController>();
+    auto shaderBlur  = resources->shader("blur");
     auto shaderBloom = resources->shader("bloom");
 
-    engine::graphics::OpenGL::end_bloom(shaderBlur, shaderBloom, m_bloom, m_exposure);
+    engine::graphics::OpenGL::end_bloom(shaderBlur, shaderBloom, bloom, exposure);
 
     auto platform = get<engine::platform::PlatformController>();
     platform->swap_buffers();
 }
 
-void MainController::update() { update_camera(); }
+void MainController::update() {
+    update_camera();
+}
 
 void MainController::update_camera() {
     auto gui_controller = get<GUIController>();
-    if (gui_controller->is_enabled()) return;
+    if (gui_controller->is_enabled())
+        return;
 
     auto platform = get<engine::platform::PlatformController>();
     auto graphics = get<engine::graphics::GraphicsController>();
-    auto camera = graphics->camera();
+    auto camera   = graphics->camera();
 
     float dt = platform->dt();
-    if (platform->key(engine::platform::KeyId::KEY_W).is_down()) { camera->move_camera(engine::graphics::Camera::Movement::FORWARD, dt); }
-    if (platform->key(engine::platform::KeyId::KEY_S).is_down()) { camera->move_camera(engine::graphics::Camera::Movement::BACKWARD, dt); }
-    if (platform->key(engine::platform::KeyId::KEY_A).is_down()) { camera->move_camera(engine::graphics::Camera::Movement::LEFT, dt); }
-    if (platform->key(engine::platform::KeyId::KEY_D).is_down()) { camera->move_camera(engine::graphics::Camera::Movement::RIGHT, dt); }
+    if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {
+        camera->process_keyboard(engine::graphics::Camera::Movement::FORWARD, dt);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_S).is_down()) {
+        camera->process_keyboard(engine::graphics::Camera::Movement::BACKWARD, dt);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_A).is_down()) {
+        camera->process_keyboard(engine::graphics::Camera::Movement::LEFT, dt);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_D).is_down()) {
+        camera->process_keyboard(engine::graphics::Camera::Movement::RIGHT, dt);
+    }
 
     auto mouse = platform->mouse();
-    camera->rotate_camera(mouse.dx, mouse.dy);
+    camera->process_mouse_movement(mouse.dx, mouse.dy);
     //camera->process_mouse_scroll(mouse.scroll);
 
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !m_bloomKeyPressed) {
@@ -300,7 +311,7 @@ void MainController::initialize_bloom() {
 
 void MainController::set_spot_light(engine::resources::Shader *shader) {
     auto graphics = get<engine::graphics::GraphicsController>();
-    auto camera = graphics->camera();
+    auto camera   = graphics->camera();
 
     shader->set_vec3("light.position", camera->Position);
     shader->set_vec3("light.direction", camera->Front);
