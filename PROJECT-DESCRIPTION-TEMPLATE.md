@@ -44,6 +44,7 @@ T -> Čini zvezdu sjajnijom za 3 sekunde, posle 3 sekunde
 https://www.turbosquid.com/3d-models/stylized-planet-system-4k-free-1973128
 https://sketchfab.com/3d-models/sun-with-2k-textures-bac9e8f95040484bb86f1deb9bd6fe95
 https://sketchfab.com/3d-models/8-low-poly-asteroids-6019fc70e28f4b5283f66a4d1d21741b
+https://sketchfab.com/3d-models/space-fighter-e766136d4871441289d37d44a4bbcd3b
 
 ## Textures:
 
