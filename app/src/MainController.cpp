@@ -386,7 +386,7 @@ void MainController::poll_events() {
     if (platform->key(engine::platform::KeyId::KEY_L).is_down()) {
         spotLightColor[2] += 0.02f;
     }
-    if (platform->key(engine::platform::KeyId::KEY_U).is_down()) {
+    if (platform->key(engine::platform::KeyId::KEY_I).is_down()) {
         spotLightColor[0] = std::max(spotLightColor[0] - 0.02f, 0.0f);
     }
     if (platform->key(engine::platform::KeyId::KEY_O).is_down()) {
