@@ -330,6 +330,7 @@ void MainController::set_rotation(engine::resources::Shader *shader, int speed) 
     rotation      = translate(rotation, -starPos);
 
     shader->set_mat4("starRotation", rotation);
+    //shader->set_mat4("starRotation", glm::mat4(1.0f));
 }
 
 void MainController::poll_events() {
