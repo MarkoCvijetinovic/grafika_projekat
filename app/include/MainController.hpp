@@ -58,7 +58,7 @@ private:
 
     void set_rotation(engine::resources::Shader *shader, int speed);
 
-    void alter_star_terran();
+    void alter_star();
 
     unsigned int amount      = 2000;
     glm::mat4 *modelMatrices = nullptr;

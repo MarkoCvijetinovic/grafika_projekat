@@ -36,7 +36,8 @@ void MainController::initialize() {
 
 bool MainController::loop() {
     auto platform = get<engine::platform::PlatformController>();
-    if (platform->key(engine::platform::KeyId::KEY_ESCAPE).is_down()) return false;
+    if (platform->key(engine::platform::KeyId::KEY_ESCAPE).is_down())
+        return false;
 
     return true;
 }
@@ -212,24 +213,35 @@ void MainController::end_draw() {
     platform->swap_buffers();
 }
 
-void MainController::update() { update_camera(); }
+void MainController::update() {
+    update_camera();
+}
 
 void MainController::update_camera() {
     auto gui_controller = get<GUIController>();
-    if (gui_controller->is_enabled()) return;
+    if (gui_controller->is_enabled())
+        return;
 
     auto platform = get<engine::platform::PlatformController>();
     auto graphics = get<engine::graphics::GraphicsController>();
     auto camera = graphics->camera();
 
     float dt = platform->dt();
-    if (platform->key(engine::platform::KeyId::KEY_W).is_down()) { camera->move_camera(engine::graphics::Camera::Movement::FORWARD, dt); }
-    if (platform->key(engine::platform::KeyId::KEY_S).is_down()) { camera->move_camera(engine::graphics::Camera::Movement::BACKWARD, dt); }
-    if (platform->key(engine::platform::KeyId::KEY_A).is_down()) { camera->move_camera(engine::graphics::Camera::Movement::LEFT, dt); }
-    if (platform->key(engine::platform::KeyId::KEY_D).is_down()) { camera->move_camera(engine::graphics::Camera::Movement::RIGHT, dt); }
+    if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {
+        camera->process_keyboard(engine::graphics::Camera::Movement::FORWARD, dt);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_S).is_down()) {
+        camera->process_keyboard(engine::graphics::Camera::Movement::BACKWARD, dt);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_A).is_down()) {
+        camera->process_keyboard(engine::graphics::Camera::Movement::LEFT, dt);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_D).is_down()) {
+        camera->process_keyboard(engine::graphics::Camera::Movement::RIGHT, dt);
+    }
 
     auto mouse = platform->mouse();
-    camera->move_camera(mouse.dx, mouse.dy);
+    camera->process_mouse_movement(mouse.dx, mouse.dy);
     //camera->process_mouse_scroll(mouse.scroll);
 
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
@@ -263,12 +275,12 @@ void MainController::initialize_asteroids() {
         // 1. translation: displace along circle with 'radius' in range [-offset, offset]
         float angle = (float) i / (float) amount * 360.0f;
         float displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
-        float x = sin(angle) * radius + displacement;
-        displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
-        float y = displacement * 0.4f;// keep height of asteroid field smaller compared to width of x and z
-        displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
-        float z = cos(angle) * radius + displacement;
-        model = translate(model, glm::vec3(x, y, z));
+        float x            = sin(angle) * radius + displacement;
+        displacement       = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
+        float y            = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
+        displacement       = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
+        float z            = cos(angle) * radius + displacement;
+        model              = glm::translate(model, glm::vec3(x, y, z));
 
         // 2. scale: Scale between 0.05 and 0.25f
         float scale = static_cast<float>((rand() % 20) / 2000.0 + 0.0025);
@@ -286,7 +298,6 @@ void MainController::initialize_asteroids() {
     auto asteroid = resources->model("asteroid");
 
     engine::graphics::OpenGL::initialize_instancing(asteroid, modelMatrices, amount);
-
 }
 
 void MainController::initialize_bloom() {
@@ -349,28 +360,48 @@ void MainController::poll_events() {
         bloom = !bloom;
         bloomKeyPressed = true;
     }
-    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) { bloomKeyPressed = false; }
+    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) {
+        bloomKeyPressed = false;
+    }
 
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
-        if (exposure > 0.0f) exposure -= 0.001f;
-        else exposure = 0.0f;
-    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) { exposure += 0.001f; }
+        if (exposure > 0.0f)
+            exposure -= 0.001f;
+        else
+            exposure = 0.0f;
+    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
+        exposure += 0.001f;
+    }
 
-    if (platform->key(engine::platform::KeyId::KEY_J).is_down()) { spotLightColor[0] += 0.02f; }
-    if (platform->key(engine::platform::KeyId::KEY_K).is_down()) { spotLightColor[1] += 0.02f; }
-    if (platform->key(engine::platform::KeyId::KEY_L).is_down()) { spotLightColor[2] += 0.02f; }
-    if (platform->key(engine::platform::KeyId::KEY_I).is_down()) { spotLightColor[0] = std::max(spotLightColor[0] - 0.02f, 0.0f); }
-    if (platform->key(engine::platform::KeyId::KEY_O).is_down()) { spotLightColor[1] = std::max(spotLightColor[1] - 0.02f, 0.0f); }
-    if (platform->key(engine::platform::KeyId::KEY_P).is_down()) { spotLightColor[2] = std::max(spotLightColor[2] - 0.02f, 0.0f); }
+    if (platform->key(engine::platform::KeyId::KEY_J).is_down()) {
+        spotLightColor[0] += 0.02f;
+    }
+    if (platform->key(engine::platform::KeyId::KEY_K).is_down()) {
+        spotLightColor[1] += 0.02f;
+    }
+    if (platform->key(engine::platform::KeyId::KEY_L).is_down()) {
+        spotLightColor[2] += 0.02f;
+    }
+    if (platform->key(engine::platform::KeyId::KEY_I).is_down()) {
+        spotLightColor[0] = std::max(spotLightColor[0] - 0.02f, 0.0f);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_O).is_down()) {
+        spotLightColor[1] = std::max(spotLightColor[1] - 0.02f, 0.0f);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_P).is_down()) {
+        spotLightColor[2] = std::max(spotLightColor[2] - 0.02f, 0.0f);
+    }
 
     if (platform->key(engine::platform::KeyId::KEY_T).is_down() && !starKeyPressed) {
-        std::thread(&MainController::alter_star_terran, this).detach();
+        std::thread(&MainController::alter_star, this).detach();
         starKeyPressed = true;
     }
-    if (platform->key(engine::platform::KeyId::KEY_T).is_up()) { starKeyPressed = false; }
+    if (platform->key(engine::platform::KeyId::KEY_T).is_up()) {
+        starKeyPressed = false;
+    }
 }
 
-void MainController::alter_star_terran() {
+void MainController::alter_star() {
     std::this_thread::sleep_for(std::chrono::seconds(3));
     starLuminocity *= 1.5f;
     std::this_thread::sleep_for(std::chrono::seconds(3));
