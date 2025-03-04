@@ -58,7 +58,7 @@ private:
 
     void set_rotation(engine::resources::Shader *shader, int speed);
 
-    void alter_star();
+    void alter_star_terran();
 
     unsigned int amount      = 2000;
     glm::mat4 *modelMatrices = nullptr;
@@ -74,7 +74,7 @@ private:
     float exposure       = 1.5f;
 
     glm::vec3 spotLightColor = glm::vec3(0.7f, 0.7f, 0.7f);
-    float starScale          = 0.6f;
+    float terranScale        = 0.1f;
     float starLuminocity     = 1.8f;
     bool starKeyPressed      = false;
 };

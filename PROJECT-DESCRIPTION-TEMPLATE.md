@@ -9,7 +9,7 @@ A, W, S, D -> Pomeranje na sceni
 SPACE -> Uključivanje i isključivanje bloom-a
 J, K, L -> Pojačavanje red, green, blue komponente, tim redom, spot svetla
 I, O, P -> Smanjivanje red, green, blue komponente, tim redom, spot svetla
-T -> Čini zvezdu sjajnijom za 3 sekunde, posle 3 sekunde
+T -> Čini zvezdu sjajnijom za 3 sekunde, onda poveća jednu od planeta za 3 sekunde
 
 ## Features
 

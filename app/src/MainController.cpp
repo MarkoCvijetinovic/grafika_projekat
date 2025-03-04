@@ -116,7 +116,7 @@ void MainController::draw_terran() {
 
     glm::mat4 model = glm::mat4(1.0f);
     model           = translate(model, glm::vec3(4.0f, 0.0f, -2.0f));
-    model           = scale(model, glm::vec3(0.1f));
+    model           = scale(model, glm::vec3(terranScale));
     shader->set_mat4("model", model);
 
     set_rotation(shader, 18000);
@@ -135,7 +135,7 @@ void MainController::draw_star() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model = glm::mat4(1.0f);
     model           = translate(model, starPos);
-    model           = scale(model, glm::vec3(starScale));
+    model           = scale(model, glm::vec3(0.6f));
     shader->set_mat4("model", model);
     shader->set_float("luminocity", starLuminocity);
 
@@ -398,7 +398,7 @@ void MainController::poll_events() {
     }
 
     if (platform->key(engine::platform::KeyId::KEY_T).is_down() && !starKeyPressed) {
-        std::thread(&MainController::alter_star, this).detach();
+        std::thread(&MainController::alter_star_terran, this).detach();
         starKeyPressed = true;
     }
     if (platform->key(engine::platform::KeyId::KEY_T).is_up()) {
@@ -406,9 +406,12 @@ void MainController::poll_events() {
     }
 }
 
-void MainController::alter_star() {
+void MainController::alter_star_terran() {
     std::this_thread::sleep_for(std::chrono::seconds(3));
     starLuminocity *= 1.5f;
     std::this_thread::sleep_for(std::chrono::seconds(3));
     starLuminocity /= 1.5f;
+    terranScale *= 2.0f;
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    terranScale /= 2.0f;
 }
