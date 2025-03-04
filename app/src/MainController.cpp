@@ -10,6 +10,7 @@
 #include <future>
 #include <chrono>
 #include <thread>
+#include <libs/glad/include/glad/glad.h>
 #include <spdlog/spdlog.h>
 
 #include "GUIController.hpp"
@@ -228,7 +229,7 @@ void MainController::update_camera() {
     if (platform->key(engine::platform::KeyId::KEY_D).is_down()) { camera->move_camera(engine::graphics::Camera::Movement::RIGHT, dt); }
 
     auto mouse = platform->mouse();
-    camera->rotate_camera(mouse.dx, mouse.dy);
+    camera->move_camera(mouse.dx, mouse.dy);
     //camera->process_mouse_scroll(mouse.scroll);
 
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
@@ -267,7 +268,7 @@ void MainController::initialize_asteroids() {
         float y = displacement * 0.4f;// keep height of asteroid field smaller compared to width of x and z
         displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
         float z = cos(angle) * radius + displacement;
-        model = glm::translate(model, glm::vec3(x, y, z));
+        model = translate(model, glm::vec3(x, y, z));
 
         // 2. scale: Scale between 0.05 and 0.25f
         float scale = static_cast<float>((rand() % 20) / 2000.0 + 0.0025);
@@ -285,6 +286,7 @@ void MainController::initialize_asteroids() {
     auto asteroid = resources->model("asteroid");
 
     engine::graphics::OpenGL::initialize_instancing(asteroid, modelMatrices, amount);
+
 }
 
 void MainController::initialize_bloom() {
@@ -362,13 +364,13 @@ void MainController::poll_events() {
     if (platform->key(engine::platform::KeyId::KEY_P).is_down()) { spotLightColor[2] = std::max(spotLightColor[2] - 0.02f, 0.0f); }
 
     if (platform->key(engine::platform::KeyId::KEY_T).is_down() && !starKeyPressed) {
-        std::thread(&MainController::alter_star, this).detach();
+        std::thread(&MainController::alter_star_terran, this).detach();
         starKeyPressed = true;
     }
     if (platform->key(engine::platform::KeyId::KEY_T).is_up()) { starKeyPressed = false; }
 }
 
-void MainController::alter_star() {
+void MainController::alter_star_terran() {
     std::this_thread::sleep_for(std::chrono::seconds(3));
     starLuminocity *= 1.5f;
     std::this_thread::sleep_for(std::chrono::seconds(3));
