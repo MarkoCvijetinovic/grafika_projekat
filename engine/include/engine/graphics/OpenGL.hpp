@@ -133,6 +133,21 @@ namespace engine::graphics {
         */
         static void clear_buffers();
 
+        static void begin_bloom();
+
+        static void initialize_bloom(int SCR_WIDTH, int SCR_HEIGHT, const resources::Shader *shaderBlur,
+                                     const resources::Shader *shaderBloom);
+
+        static void render_quad();
+
+        static void end_bloom(const resources::Shader *shaderBlur, const resources::Shader *shaderBloom, float bloom,
+                              float exposure);
+
+        static void initialize_instancing(const resources::Model *model, const glm::mat4 *modelMatrices,
+                                          unsigned int amount);
+
+        static void draw_instanced(const resources::Model *model, unsigned int amount);
+
         /**
         * @brief Retrieve the shader compilation error log message.
         * @param shader_id Shader id for which the compilation failed.
@@ -147,6 +162,13 @@ namespace engine::graphics {
         * @param location Source location from where the OpenGL call was made.
         */
         static void assert_no_error(std::source_location location);
+
+        static unsigned int m_hdrFBO;
+        static unsigned int m_pingpongFBO[2];
+        static unsigned int m_pingpongColorbuffers[2];
+        static unsigned int m_colorBuffers[2];
+        static unsigned int m_quadVAO;
+        static unsigned int m_quadVBO;
     };
 }
 #endif //OPENGL_HPP
