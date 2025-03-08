@@ -106,8 +106,6 @@ void MainController::draw_csilla() {
 
     set_rotation(shader, m_csillaSpeed);
 
-    csilla->draw(shader);
-
     shader->set_float("lightModifier", 1.3f);
     for (int i = 0; i < 4; i++) {
         model = glm::mat4(1.0f);
@@ -274,7 +272,7 @@ void MainController::update_camera() {
 }
 
 void MainController::initialize_asteroids() {
-    m_modelMatrices = new glm::mat4[m_amount];
+    modelMatrices = new glm::mat4[amount];
     auto platform = get<engine::platform::PlatformController>();
     srand(static_cast<unsigned int>(platform->frame_time().current));// initialize random seed
 
