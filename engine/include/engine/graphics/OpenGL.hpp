@@ -165,12 +165,12 @@ public:
         */
         static void assert_no_error(std::source_location location);
 
-        static unsigned int hdrFBO;
-        static unsigned int pingpongFBO[2];
-        static unsigned int pingpongColorbuffers[2];
-        static unsigned int colorBuffers[2];
-        static unsigned int quadVAO;
-        static unsigned int quadVBO;
+        static unsigned int m_hdrFBO;
+        static unsigned int m_pingpongFBO[2];
+        static unsigned int m_pingpongColorbuffers[2];
+        static unsigned int m_colorBuffers[2];
+        static unsigned int m_quadVAO;
+        static unsigned int m_quadVBO;
     };
 }
 #endif //OPENGL_HPP
