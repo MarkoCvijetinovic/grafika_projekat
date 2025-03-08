@@ -2,7 +2,6 @@
 // Created by marko-cvijetinovic on 1/17/25.
 //
 
-#include <cmath>
 #include <engine/core/Engine.hpp>
 #include <engine/graphics/GraphicsController.hpp>
 
@@ -14,8 +13,6 @@
 #include <spdlog/spdlog.h>
 
 #include "GUIController.hpp"
-
-#include <random>
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
 public:
@@ -256,35 +253,29 @@ void MainController::initialize_asteroids() {
     auto platform = get<engine::platform::PlatformController>();
     srand(static_cast<unsigned int>(platform->frame_time().current));// initialize random seed
 
+    float radius = 1.0;
+    float offset = 0.25f;
     for (unsigned int i = 0; i < m_amount; i++) {
-        float offset = 0.25f;
-        float radius = 1.0;
-        auto model = glm::mat4(1.0f);
+        glm::mat4 model = glm::mat4(1.0f);
         model = translate(model, m_csillaPos);
 
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        static std::uniform_real_distribution dis_offset(-offset, offset);
-        static std::uniform_real_distribution dis_scale(0.003f, 0.015f);
-        static std::uniform_real_distribution dis_rotation(0.0f, 360.0f);
-
-        // 1. Translation: displace along a circle with 'radius' in range [-offset, offset]
-        float angle = static_cast<float>(i) / static_cast<float>(m_amount) * 360.0f;
-        float displacement = dis_offset(gen);
-        float x = std::sin(glm::radians(angle)) * radius + displacement;
-        displacement = dis_offset(gen);
-        float y = displacement * 0.4f;// Keep height smaller compared to width
-        displacement = dis_offset(gen);
-        float z = std::cos(glm::radians(angle)) * radius + displacement;
+        // 1. translation: displace along circle with 'radius' in range [-offset, offset]
+        float angle = (float) i / (float) m_amount * 360.0f;
+        float displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
+        float x = sin(angle) * radius + displacement;
+        displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
+        float y = displacement * 0.4f;// keep height of asteroid field smaller compared to width of x and z
+        displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
+        float z = cos(angle) * radius + displacement;
         model = glm::translate(model, glm::vec3(x, y, z));
 
-        // 2. Scale: Scale between 0.05 and 0.25
-        float scale = dis_scale(gen);
+        // 2. scale: Scale between 0.05 and 0.25f
+        float scale = static_cast<float>((rand() % 20) / 2000.0 + 0.0025);
         model = glm::scale(model, glm::vec3(scale));
 
-        // 3. Rotation: Add random rotation around a (semi)randomly picked rotation axis vector
-        float rotAngle = dis_rotation(gen);
-        model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0.4f, 0.6f, 0.8f));
+        // 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
+        float rotAngle = static_cast<float>((rand() % 360));
+        model = rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
 
         // 4. now add to list of matrices
         m_modelMatrices[i] = model;

@@ -9,7 +9,9 @@
 
 class MainController : public engine::core::Controller {
 public:
-    [[nodiscard]] std::string_view name() const override { return "MainController"; }
+    [[nodiscard]] std::string_view name() const override {
+        return "MainController";
+    }
 
 private:
     void initialize() override;
@@ -58,23 +60,23 @@ private:
 
     void alter_star();
 
-    unsigned int m_amount = 2000;
+    unsigned int m_amount      = 2000;
     glm::mat4 *m_modelMatrices = nullptr;
 
-    glm::vec3 m_starPos = glm::vec3(-5.0f, 0.0f, -8.0f);
+    glm::vec3 m_starPos   = glm::vec3(-5.0f, 0.0f, -8.0f);
     glm::vec3 m_starColor = glm::vec3(1.0f, 0.9f, 0.6f);
 
     glm::vec3 m_csillaPos = glm::vec3(0.5f, 0.0f, -1.0f);
-    int m_csillaSpeed = 10000;
+    int m_csillaSpeed     = 10000;
 
-    bool m_bloom = true;
+    bool m_bloom           = true;
     bool m_bloomKeyPressed = false;
-    float m_exposure = 1.5f;
+    float m_exposure       = 1.5f;
 
     glm::vec3 m_spotLightColor = glm::vec3(0.7f, 0.7f, 0.7f);
-    float m_terranScale = 0.1f;
-    float m_starLuminocity = 1.8f;
-    bool m_starKeyPressed = false;
+    float m_terranScale        = 0.1f;
+    float m_starLuminocity     = 1.8f;
+    bool m_starKeyPressed      = false;
 };
 
 #endif //MAINCONTROLLER_HPP
