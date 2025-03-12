@@ -3,7 +3,6 @@
 //
 
 #include <cmath>
-#include <engine/core/Engine.hpp>
 #include <engine/graphics/GraphicsController.hpp>
 
 #include "MainController.hpp"
@@ -11,11 +10,10 @@
 #include <future>
 #include <chrono>
 #include <thread>
+#include <random>
 #include <spdlog/spdlog.h>
 
 #include "GUIController.hpp"
-
-#include <random>
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
 public:
@@ -95,7 +93,7 @@ void MainController::configure_planet() {
 
 void MainController::draw_csilla() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto mars = resources->model("csilla");
+    auto csilla = resources->model("csilla");
     auto shader = resources->shader("planet");
     shader->use();
 
@@ -106,12 +104,26 @@ void MainController::draw_csilla() {
 
     set_rotation(shader, m_csillaSpeed);
 
-    mars->draw(shader);
+    csilla->draw(shader);
+
+    shader->set_float("lightModifier", 1.3f);
+    for (int i = 0; i < 4; i++) {
+        model = glm::mat4(1.0f);
+        model = translate(model, m_starPos + glm::vec3(2.5f - i % 2 * 5.0f, 0.0f, 2.5f - i / 2 * 5.0f));
+        model = scale(model, glm::vec3(0.1f));
+        model = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        shader->set_mat4("model", model);
+
+        set_rotation(shader, 3000);
+
+        csilla->draw(shader);
+    }
+    shader->set_float("lightModifier", 1.0f);
 }
 
 void MainController::draw_terran() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto mars = resources->model("terran");
+    auto terran = resources->model("terran");
     auto shader = resources->shader("planet");
     shader->use();
 
@@ -122,7 +134,7 @@ void MainController::draw_terran() {
 
     set_rotation(shader, 18000);
 
-    mars->draw(shader);
+    terran->draw(shader);
 }
 
 void MainController::draw_star() {
@@ -359,9 +371,9 @@ void MainController::poll_events() {
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) { m_bloomKeyPressed = false; }
 
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
-        if (m_exposure > 0.0f) m_exposure -= 0.001f;
+        if (m_exposure > 0.0f) m_exposure -= 0.01f;
         else m_exposure = 0.0f;
-    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) { m_exposure += 0.001f; }
+    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) { m_exposure += 0.01f; }
 
     if (platform->key(engine::platform::KeyId::KEY_J).is_down()) { m_spotLightColor[0] += 0.02f; }
     if (platform->key(engine::platform::KeyId::KEY_K).is_down()) { m_spotLightColor[1] += 0.02f; }

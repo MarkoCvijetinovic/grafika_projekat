@@ -54,6 +54,7 @@ uniform sampler2D texture_specular;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform vec3 viewPos;
+uniform float lightModifier = 1.0f;
 
 vec3 calcPointLight() {
     //ambient
@@ -72,7 +73,7 @@ vec3 calcPointLight() {
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     vec3 specular = spec * lightColor * texture(texture_specular, TexCoords).rgb;
 
-    return (ambient + diffuse + specular);
+    return lightModifier * (ambient + diffuse + specular);
 }
 
 vec3 calcSpotLight() {
