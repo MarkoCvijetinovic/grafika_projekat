@@ -2,6 +2,7 @@
 // Created by marko-cvijetinovic on 1/17/25.
 //
 
+#include <cmath>
 #include <engine/core/Engine.hpp>
 #include <engine/graphics/GraphicsController.hpp>
 
@@ -13,6 +14,8 @@
 #include <spdlog/spdlog.h>
 
 #include "GUIController.hpp"
+
+#include <random>
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
 public:
@@ -92,7 +95,7 @@ void MainController::configure_planet() {
 
 void MainController::draw_csilla() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto mars = resources->model("csilla");
+    auto csilla = resources->model("csilla");
     auto shader = resources->shader("planet");
     shader->use();
 
@@ -103,7 +106,21 @@ void MainController::draw_csilla() {
 
     set_rotation(shader, m_csillaSpeed);
 
-    mars->draw(shader);
+    csilla->draw(shader);
+
+    shader->set_float("lightModifier", 1.3f);
+    for (int i = 0; i < 4; i++) {
+        model = glm::mat4(1.0f);
+        model = translate(model, m_starPos + glm::vec3(2.5f - i % 2 * 5.0f, 0.0f, 2.5f - i / 2 * 5.0f));
+        model = scale(model, glm::vec3(0.1f));
+        model = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        shader->set_mat4("model", model);
+
+        set_rotation(shader, 3000);
+
+        csilla->draw(shader);
+    }
+    shader->set_float("lightModifier", 1.0f);
 }
 
 void MainController::draw_terran() {
@@ -182,9 +199,9 @@ void MainController::begin_draw() {
 
 void MainController::draw_skybox() {
     auto resources = get<engine::resources::ResourcesController>();
-    auto skybox    = resources->skybox("galaxy_skybox");
-    auto shader    = resources->shader("skybox");
-    auto graphics  = get<engine::graphics::GraphicsController>();
+    auto skybox = resources->skybox("galaxy_skybox");
+    auto shader = resources->shader("skybox");
+    auto graphics = get<engine::graphics::GraphicsController>();
     graphics->draw_skybox(shader, skybox);
 }
 
@@ -201,8 +218,8 @@ void MainController::draw() {
 }
 
 void MainController::end_draw() {
-    auto resources   = get<engine::resources::ResourcesController>();
-    auto shaderBlur  = resources->shader("blur");
+    auto resources = get<engine::resources::ResourcesController>();
+    auto shaderBlur = resources->shader("blur");
     auto shaderBloom = resources->shader("bloom");
 
     engine::graphics::OpenGL::end_bloom(shaderBlur, shaderBloom, m_bloom, m_exposure);
@@ -211,18 +228,15 @@ void MainController::end_draw() {
     platform->swap_buffers();
 }
 
-void MainController::update() {
-    update_camera();
-}
+void MainController::update() { update_camera(); }
 
 void MainController::update_camera() {
     auto gui_controller = get<GUIController>();
-    if (gui_controller->is_enabled())
-        return;
+    if (gui_controller->is_enabled()) return;
 
     auto platform = get<engine::platform::PlatformController>();
     auto graphics = get<engine::graphics::GraphicsController>();
-    auto camera   = graphics->camera();
+    auto camera = graphics->camera();
 
     float dt = platform->dt();
     if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {
@@ -264,29 +278,35 @@ void MainController::initialize_asteroids() {
     auto platform = get<engine::platform::PlatformController>();
     srand(static_cast<unsigned int>(platform->frame_time().current));// initialize random seed
 
-    float radius = 1.0;
-    float offset = 0.25f;
     for (unsigned int i = 0; i < m_amount; i++) {
-        glm::mat4 model = glm::mat4(1.0f);
+        float offset = 0.25f;
+        float radius = 1.0;
+        auto model = glm::mat4(1.0f);
         model = translate(model, m_csillaPos);
 
-        // 1. translation: displace along circle with 'radius' in range [-offset, offset]
-        float angle = (float) i / (float) m_amount * 360.0f;
-        float displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
-        float x = sin(angle) * radius + displacement;
-        displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
-        float y = displacement * 0.4f;// keep height of asteroid field smaller compared to width of x and z
-        displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
-        float z = cos(angle) * radius + displacement;
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static std::uniform_real_distribution dis_offset(-offset, offset);
+        static std::uniform_real_distribution dis_scale(0.003f, 0.015f);
+        static std::uniform_real_distribution dis_rotation(0.0f, 360.0f);
+
+        // 1. Translation: displace along a circle with 'radius' in range [-offset, offset]
+        float angle = static_cast<float>(i) / static_cast<float>(m_amount) * 360.0f;
+        float displacement = dis_offset(gen);
+        float x = std::sin(glm::radians(angle)) * radius + displacement;
+        displacement = dis_offset(gen);
+        float y = displacement * 0.4f;// Keep height smaller compared to width
+        displacement = dis_offset(gen);
+        float z = std::cos(glm::radians(angle)) * radius + displacement;
         model = glm::translate(model, glm::vec3(x, y, z));
 
-        // 2. scale: Scale between 0.05 and 0.25f
-        float scale = static_cast<float>((rand() % 20) / 2000.0 + 0.0025);
+        // 2. Scale: Scale between 0.05 and 0.25
+        float scale = dis_scale(gen);
         model = glm::scale(model, glm::vec3(scale));
 
-        // 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
-        float rotAngle = static_cast<float>((rand() % 360));
-        model = rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+        // 3. Rotation: Add random rotation around a (semi)randomly picked rotation axis vector
+        float rotAngle = dis_rotation(gen);
+        model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0.4f, 0.6f, 0.8f));
 
         // 4. now add to list of matrices
         m_modelMatrices[i] = model;
@@ -311,7 +331,7 @@ void MainController::initialize_bloom() {
 
 void MainController::set_spot_light(engine::resources::Shader *shader) {
     auto graphics = get<engine::graphics::GraphicsController>();
-    auto camera   = graphics->camera();
+    auto camera = graphics->camera();
 
     shader->set_vec3("light.position", camera->Position);
     shader->set_vec3("light.direction", camera->Front);
@@ -361,9 +381,9 @@ void MainController::poll_events() {
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) { m_bloomKeyPressed = false; }
 
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
-        if (m_exposure > 0.0f) m_exposure -= 0.001f;
+        if (m_exposure > 0.0f) m_exposure -= 0.01f;
         else m_exposure = 0.0f;
-    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) { m_exposure += 0.001f; }
+    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) { m_exposure += 0.01f; }
 
     if (platform->key(engine::platform::KeyId::KEY_J).is_down()) { m_spotLightColor[0] += 0.02f; }
     if (platform->key(engine::platform::KeyId::KEY_K).is_down()) { m_spotLightColor[1] += 0.02f; }
