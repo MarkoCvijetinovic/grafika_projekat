@@ -5,10 +5,11 @@
 
 ## Controls
 
-{BUTTON1} -> {ACTION1}  
-{BUTTON2} -> {ACTION2}  
-...  
-{BUTTONN} -> {ACTIONN}
+A, W, S, D -> Pomeranje na sceni  
+SPACE -> Uključivanje i isključivanje bloom-a
+J, K, L -> Pojačavanje red, green, blue komponente, tim redom, spot svetla
+I, O, P -> Smanjivanje red, green, blue komponente, tim redom, spot svetla
+T -> Čini zvezdu sjajnijom za 3 sekunde, onda poveća jednu od planeta za 3 sekunde
 
 ## Features
 
@@ -24,9 +25,10 @@
 [ ] Instancing  
 [ ] Off-screen Anti-Aliasing  
 [ ] Parallax Mapping
+[ ] Bloom with the use of HDR
 
 ### Group B:
-[ ] Bloom with the use of HDR  
+
 [ ] Deferred Shading  
 [ ] Point Shadows  
 [ ] SSAO
