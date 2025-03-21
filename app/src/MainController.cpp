@@ -169,7 +169,7 @@ void MainController::draw_asteroid() {
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
 
-    engine::graphics::OpenGL::draw_instanced(asteroid, amount);
+    engine::graphics::OpenGL::draw_instanced(asteroid, m_amount);
 }
 
 void MainController::begin_draw() {
@@ -205,7 +205,7 @@ void MainController::end_draw() {
     auto shaderBlur  = resources->shader("blur");
     auto shaderBloom = resources->shader("bloom");
 
-    engine::graphics::OpenGL::end_bloom(shaderBlur, shaderBloom, bloom, exposure);
+    engine::graphics::OpenGL::end_bloom(shaderBlur, shaderBloom, m_bloom, m_exposure);
 
     auto platform = get<engine::platform::PlatformController>();
     platform->swap_buffers();
