@@ -7,6 +7,7 @@
 #define OPENGL_HPP
 #include <cstdint>
 #include <filesystem>
+#include <engine/resources/Model.hpp>
 #include <engine/resources/Shader.hpp>
 
 namespace engine::resources {
