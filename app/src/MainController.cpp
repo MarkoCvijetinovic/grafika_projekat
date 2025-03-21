@@ -52,8 +52,6 @@ void MainController::draw_phoenix() {
     model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
 
-    set_rotation(shader, 6000);
-
     phoenix->draw(shader);
 }
 
@@ -64,12 +62,10 @@ void MainController::draw_spaceship() {
     shader->use();
 
     glm::mat4 model = glm::mat4(1.0f);
-    model           = translate(model, csillaPos + glm::vec3(0.1f, 0.2f, 1.4f));
+    model           = translate(model, marsPos + glm::vec3(0.1f, 0.2f, 1.4f));
     model           = scale(model, glm::vec3(0.001f));
     model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
-
-    set_rotation(shader, csillaSpeed);
 
     spaceship->draw(shader);
 }
@@ -88,6 +84,7 @@ void MainController::configure_planet() {
 
     set_spot_light(shader);
     set_star_light(shader);
+    //set_rotation(shader);
 }
 
 void MainController::draw_csilla() {
@@ -97,11 +94,9 @@ void MainController::draw_csilla() {
     shader->use();
 
     glm::mat4 model = glm::mat4(1.0f);
-    model           = translate(model, csillaPos);
+    model           = translate(model, marsPos);
     model           = scale(model, glm::vec3(0.1f));
     shader->set_mat4("model", model);
-
-    set_rotation(shader, csillaSpeed);
 
     mars->draw(shader);
 }
@@ -116,8 +111,6 @@ void MainController::draw_terran() {
     model           = translate(model, glm::vec3(4.0f, 0.0f, -2.0f));
     model           = scale(model, glm::vec3(0.1f));
     shader->set_mat4("model", model);
-
-    set_rotation(shader, 18000);
 
     mars->draw(shader);
 }
@@ -154,14 +147,14 @@ void MainController::draw_asteroid() {
 
     set_star_light(shader);
     set_spot_light(shader);
-    set_rotation(shader, csillaSpeed);
+    //set_rotation(shader);
 
     auto platform = get<engine::platform::PlatformController>();
-    float angle   = fmod((platform->frame_time().current), 3000) / (3000.0f / 360);
+    float angle   = fmod((platform->frame_time().current), 12000) / (12000.0f / 360);
 
-    auto rotation = translate(glm::mat4(1.0f), csillaPos);
+    auto rotation = translate(glm::mat4(1.0f), marsPos);
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-    rotation      = translate(rotation, -csillaPos);
+    rotation      = translate(rotation, -marsPos);
 
     shader->set_mat4("moonRotation", rotation);
 
@@ -190,9 +183,9 @@ void MainController::draw_skybox() {
 void MainController::draw() {
     configure_planet();
     draw_phoenix();
-    draw_csilla();
     draw_asteroid();
     draw_spaceship();
+    draw_csilla();
     draw_terran();
     draw_star();
     draw_skybox();
@@ -271,7 +264,7 @@ void MainController::initialize_asteroids() {
     float offset = 0.25f;
     for (unsigned int i = 0; i < amount; i++) {
         glm::mat4 model = glm::mat4(1.0f);
-        model           = translate(model, csillaPos);
+        model           = translate(model, marsPos);
 
         // 1. translation: displace along circle with 'radius' in range [-offset, offset]
         float angle        = (float) i / (float) amount * 360.0f;
@@ -338,10 +331,9 @@ void MainController::set_star_light(engine::resources::Shader *shader) {
     shader->set_vec3("lightColor", starColor);
 }
 
-void MainController::set_rotation(engine::resources::Shader *shader, int speed) {
+void MainController::set_rotation(engine::resources::Shader *shader) {
     auto platform = get<engine::platform::PlatformController>();
-
-    float angle = fmod((platform->frame_time().current), speed) / (speed / 360.0);
+    float angle   = fmod((platform->frame_time().current), 15000) / (15000.0f / 360);
 
     auto rotation = translate(glm::mat4(1.0f), starPos);
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
