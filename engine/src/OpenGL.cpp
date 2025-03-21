@@ -364,33 +364,13 @@ namespace engine::graphics {
         }
     }
 
-    uint32_t face_index(std::string_view name) {
-        if (name == "right") {
-            return 0;
-        } else if (name == "left") {
-            return 1;
-        } else if (name == "top") {
-            return 2;
-        } else if (name == "bottom") {
-            return 3;
-        } else if (name == "front") {
-            return 4;
-        } else if (name == "back") {
-            return 5;
-        } else {
-            RG_SHOULD_NOT_REACH_HERE(
-                    "Unknown face name: {}. The cubemap textures should be named: right, left, top, bottom, front, back; by their respective faces in the cubemap. The extension of the image file is ignored.",
-                    name);
-        }
-    }
-
-int32_t stbi_number_of_channels_to_gl_format(int32_t number_of_channels) {
-    switch (number_of_channels) {
+    int32_t stbi_number_of_channels_to_gl_format(int32_t number_of_channels) {
+        switch (number_of_channels) {
         case 1: return GL_RED;
         case 3: return GL_RGB;
         case 4: return GL_RGBA;
         default: RG_SHOULD_NOT_REACH_HERE("Unknown channels {}", number_of_channels);
+        }
     }
-}
 
 };
