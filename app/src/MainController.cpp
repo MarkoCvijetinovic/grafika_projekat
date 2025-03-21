@@ -7,7 +7,9 @@
 
 #include "MainController.hpp"
 
-#include <libs/assimp/code/AssetLib/3MF/3MFXmlTags.h>
+#include <future>
+#include <chrono>
+#include <thread>
 #include <libs/glad/include/glad/glad.h>
 #include <spdlog/spdlog.h>
 
@@ -49,8 +51,10 @@ void MainController::draw_phoenix() {
     glm::mat4 model = glm::mat4(1.0f);
     model           = translate(model, glm::vec3(-2.0f, 0.0f, -3.0f));
     model           = scale(model, glm::vec3(0.8f));
-    model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model           = rotate(model, glm::radians(-20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
+
+    set_rotation(shader, 6000);
 
     phoenix->draw(shader);
 }
@@ -62,10 +66,12 @@ void MainController::draw_spaceship() {
     shader->use();
 
     glm::mat4 model = glm::mat4(1.0f);
-    model           = translate(model, marsPos + glm::vec3(0.1f, 0.2f, 1.4f));
+    model           = translate(model, csillaPos + glm::vec3(0.1f, 0.2f, 1.4f));
     model           = scale(model, glm::vec3(0.001f));
     model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
+
+    set_rotation(shader, csillaSpeed);
 
     spaceship->draw(shader);
 }
@@ -84,7 +90,6 @@ void MainController::configure_planet() {
 
     set_spot_light(shader);
     set_star_light(shader);
-    //set_rotation(shader);
 }
 
 void MainController::draw_csilla() {
@@ -94,9 +99,11 @@ void MainController::draw_csilla() {
     shader->use();
 
     glm::mat4 model = glm::mat4(1.0f);
-    model           = translate(model, marsPos);
+    model           = translate(model, csillaPos);
     model           = scale(model, glm::vec3(0.1f));
     shader->set_mat4("model", model);
+
+    set_rotation(shader, csillaSpeed);
 
     mars->draw(shader);
 }
@@ -112,6 +119,8 @@ void MainController::draw_terran() {
     model           = scale(model, glm::vec3(0.1f));
     shader->set_mat4("model", model);
 
+    set_rotation(shader, 18000);
+
     mars->draw(shader);
 }
 
@@ -126,8 +135,9 @@ void MainController::draw_star() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model = glm::mat4(1.0f);
     model           = translate(model, starPos);
-    model           = scale(model, glm::vec3(0.6f));
+    model           = scale(model, glm::vec3(starScale));
     shader->set_mat4("model", model);
+    shader->set_float("luminocity", starLuminocity);
 
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
@@ -147,42 +157,29 @@ void MainController::draw_asteroid() {
 
     set_star_light(shader);
     set_spot_light(shader);
-    //set_rotation(shader);
+    set_rotation(shader, csillaSpeed);
 
     auto platform = get<engine::platform::PlatformController>();
-    float angle   = fmod((platform->frame_time().current), 12000) / (12000.0f / 360);
+    float angle   = fmod((platform->frame_time().current), 3000) / (3000.0f / 360);
 
-    auto rotation = translate(glm::mat4(1.0f), marsPos);
+    auto rotation = translate(glm::mat4(1.0f), csillaPos);
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-    rotation      = translate(rotation, -marsPos);
+    rotation      = translate(rotation, -csillaPos);
 
     shader->set_mat4("moonRotation", rotation);
 
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
 
-    for (unsigned int i = 0; i < asteroid->meshes().size(); i++) {
-        glBindVertexArray(asteroid->meshes()[i].VAO());
-        for (unsigned int j = 0; j < asteroid->meshes()[i].textures().size(); j++) {
-            glActiveTexture(GL_TEXTURE0 + j);
-            glBindTexture(GL_TEXTURE_2D, asteroid->meshes()[i].textures()[j]->id());
-        }
-        glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes()[i].num_of_indices(),
-                                GL_UNSIGNED_INT,
-                                0, amount);
-        glBindVertexArray(0);
-    }
+    engine::graphics::OpenGL::draw_instanced(asteroid, amount);
 }
 
 void MainController::begin_draw() {
-    //glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
-    auto platform  = get<engine::platform::PlatformController>();
-    int SCR_WIDTH  = platform->window()->width();
-    int SCR_HEIGHT = platform->window()->height();
-    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    engine::graphics::OpenGL::begin_bloom();
 
     engine::graphics::OpenGL::clear_buffers();
+
+    configure_planet();
 }
 
 void MainController::draw_skybox() {
@@ -196,64 +193,21 @@ void MainController::draw_skybox() {
 void MainController::draw() {
     configure_planet();
     draw_phoenix();
+    draw_csilla();
     draw_asteroid();
     draw_spaceship();
-    draw_csilla();
     draw_terran();
     draw_star();
     draw_skybox();
+    draw_star();
 }
 
 void MainController::end_draw() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     auto resources   = get<engine::resources::ResourcesController>();
     auto shaderBlur  = resources->shader("blur");
     auto shaderBloom = resources->shader("bloom");
 
-    // 2. blur bright fragments with two-pass Gaussian Blur
-    // --------------------------------------------------
-    bool horizontal     = true, first_iteration = true;
-    unsigned int amount = 10;
-
-    /*
-    shaderBlur->use();
-    for (unsigned int i = 0; i < amount; i++) {
-        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
-        shaderBlur->set_int("horizontal", horizontal);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1] : pingpongColorbuffers[!horizontal]);
-        // bind texture of other framebuffer (or scene if first iteration)
-        renderQuad();
-        horizontal = !horizontal;
-        if (first_iteration)
-            first_iteration = false;
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // 3. now render floating point color buffer to 2D quad and tonemap HDR colors to default framebuffer's (clamped) color range
-    // --------------------------------------------------------------------------------------------------------------------------
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shaderBloom->use();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
-    shaderBloom->set_int("bloom", bloom);
-    shaderBloom->set_float("exposure", exposure);
-    */
-
-    //hdr
-    /*
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shaderBloom->use();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
-    shaderBloom->set_int("bloom", bloom);
-    shaderBloom->set_float("exposure", exposure);
-    */
-
-    renderQuad();
+    engine::graphics::OpenGL::end_bloom(shaderBlur, shaderBloom, bloom, exposure);
 
     auto platform = get<engine::platform::PlatformController>();
     platform->swap_buffers();
@@ -293,18 +247,21 @@ void MainController::update_camera() {
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
         bloom           = !bloom;
         bloomKeyPressed = true;
+        spdlog::info("Bloom switched");
     }
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) {
         bloomKeyPressed = false;
     }
 
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
+        spdlog::info("Exposure decreased");
         if (exposure > 0.0f)
-            exposure -= 0.001f;
+            exposure -= 0.01f;
         else
             exposure = 0.0f;
     } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
-        exposure += 0.001f;
+        spdlog::info("Exposure increased");
+        exposure += 0.01f;
     }
 }
 
@@ -317,7 +274,7 @@ void MainController::initialize_asteroids() {
     float offset = 0.25f;
     for (unsigned int i = 0; i < amount; i++) {
         glm::mat4 model = glm::mat4(1.0f);
-        model           = translate(model, marsPos);
+        model           = translate(model, csillaPos);
 
         // 1. translation: displace along circle with 'radius' in range [-offset, offset]
         float angle        = (float) i / (float) amount * 360.0f;
@@ -327,7 +284,7 @@ void MainController::initialize_asteroids() {
         float y            = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
         displacement       = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
         float z            = cos(angle) * radius + displacement;
-        model              = glm::translate(model, glm::vec3(x, y, z));
+        model              = translate(model, glm::vec3(x, y, z));
 
         // 2. scale: Scale between 0.05 and 0.25f
         float scale = static_cast<float>((rand() % 20) / 2000.0 + 0.0025);
@@ -341,113 +298,22 @@ void MainController::initialize_asteroids() {
         modelMatrices[i] = model;
     }
 
-    unsigned int buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
-
     auto resources = get<engine::resources::ResourcesController>();
     auto asteroid  = resources->model("asteroid");
 
-    for (unsigned int i = 0; i < asteroid->meshes().size(); i++) {
-        unsigned int VAO = asteroid->meshes()[i].VAO();
-        glBindVertexArray(VAO);
-        // set attribute pointers for matrix (4 times vec4)
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void *) 0);
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void *) (sizeof(glm::vec4)));
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void *) (2 * sizeof(glm::vec4)));
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void *) (3 * sizeof(glm::vec4)));
-
-        glVertexAttribDivisor(3, 1);
-        glVertexAttribDivisor(4, 1);
-        glVertexAttribDivisor(5, 1);
-        glVertexAttribDivisor(6, 1);
-
-        glBindVertexArray(0);
-    }
+    engine::graphics::OpenGL::initialize_instancing(asteroid, modelMatrices, amount);
 
 }
 
 void MainController::initialize_bloom() {
     auto resources = get<engine::resources::ResourcesController>();
     auto platform  = get<engine::platform::PlatformController>();
-    int SCR_WIDTH  = platform->window()->width();
-    int SCR_HEIGHT = platform->window()->height();
 
-    auto shaderBlur     = resources->shader("blur");
-    auto shaderBloom    = resources->shader("bloom");
-    auto shaderPlanet   = resources->shader("planet");
-    auto shaderAsteroid = resources->shader("asteroid");
+    auto shaderBlur  = resources->shader("blur");
+    auto shaderBloom = resources->shader("bloom");
 
-    // configure (floating point) framebuffers
-    // ---------------------------------------
-    //unsigned int hdrFBO;
-    glGenFramebuffers(1, &hdrFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
-    // create 2 floating point color buffers (1 for normal rendering, other for brightness threshold values)
-    unsigned int colorBuffers[2];
-    glGenTextures(2, colorBuffers);
-    for (unsigned int i = 0; i < 2; i++) {
-        glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0,
-                     GL_RGBA, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        // attach texture to framebuffer
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
-    }
-
-    // create and attach depth buffer (renderbuffer)
-    unsigned int rboDepth;
-    glGenRenderbuffers(1, &rboDepth);
-    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, SCR_WIDTH, SCR_HEIGHT);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
-    // tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
-    unsigned int attachments[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-    glDrawBuffers(2, attachments);
-    // finally check if framebuffer is complete
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        spdlog::error("Framebuffer not complete!");
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // ping-pong-framebuffer for blurring
-    //unsigned int pingpongFBO[2];
-    //unsigned int pingpongColorbuffers[2];
-    glGenFramebuffers(2, pingpongFBO);
-    glGenTextures(2, pingpongColorbuffers);
-    for (unsigned int i = 0; i < 2; i++) {
-        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-        glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongColorbuffers[i], 0);
-        // also check if framebuffers are complete (no need for depth buffer)
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            spdlog::error("Framebuffer not complete!");
-    }
-
-    shaderPlanet->use();
-    shaderPlanet->set_int("texture_diffuse1", 0);
-    //shaderAsteroid->use();
-    //shaderAsteroid->set_int("texture_diffuse1", 0);
-    shaderBlur->use();
-    shaderBlur->set_int("image", 0);
-    shaderBloom->use();
-    shaderBloom->set_int("scene", 0);
-    shaderBloom->set_int("bloomBlur", 1);
-
+    engine::graphics::OpenGL::initialize_bloom(platform->window()->width(), platform->window()->height(), shaderBlur,
+                                               shaderBloom);
 }
 
 void MainController::set_spot_light(engine::resources::Shader *shader) {
@@ -463,8 +329,8 @@ void MainController::set_spot_light(engine::resources::Shader *shader) {
     shader->set_vec3("light.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
     // we configure the diffuse intensity slightly higher; the right lighting conditions differ with each lighting method and environment.
     // each environment and lighting type requires some tweaking to get the best out of your environment.
-    shader->set_vec3("light.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    shader->set_vec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->set_vec3("light.diffuse", spotLightColor);
+    shader->set_vec3("light.specular", spotLightColor);
     shader->set_float("light.constant", 1.0f);
     shader->set_float("light.linear", 0.35f);
     shader->set_float("light.quadratic", 0.44f);
@@ -475,15 +341,14 @@ void MainController::set_star_light(engine::resources::Shader *shader) {
     shader->set_vec3("lightColor", starColor);
 }
 
-void MainController::set_rotation(engine::resources::Shader *shader) {
+void MainController::set_rotation(engine::resources::Shader *shader, int speed) {
     auto platform = get<engine::platform::PlatformController>();
-    float angle   = fmod((platform->frame_time().current), 15000) / (15000.0f / 360);
+
+    float angle = fmod((platform->frame_time().current), speed) / (speed / 360.0);
 
     auto rotation = translate(glm::mat4(1.0f), starPos);
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
     rotation      = translate(rotation, -starPos);
-
-    //marsPos = rotation * glm::vec4(marsPos, 1.0);
 
     shader->set_mat4("starRotation", rotation);
 }
@@ -494,29 +359,55 @@ void MainController::poll_events() {
         cursor_enabled = !cursor_enabled;
         platform->set_enable_cursor(cursor_enabled);
     }
+
+    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
+        bloom           = !bloom;
+        bloomKeyPressed = true;
+    }
+    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) {
+        bloomKeyPressed = false;
+    }
+
+    if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
+        if (exposure > 0.0f)
+            exposure -= 0.001f;
+        else
+            exposure = 0.0f;
+    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
+        exposure += 0.001f;
+    }
+
+    if (platform->key(engine::platform::KeyId::KEY_J).is_down()) {
+        spotLightColor[0] += 0.02f;
+    }
+    if (platform->key(engine::platform::KeyId::KEY_K).is_down()) {
+        spotLightColor[1] += 0.02f;
+    }
+    if (platform->key(engine::platform::KeyId::KEY_L).is_down()) {
+        spotLightColor[2] += 0.02f;
+    }
+    if (platform->key(engine::platform::KeyId::KEY_U).is_down()) {
+        spotLightColor[0] = std::max(spotLightColor[0] - 0.02f, 0.0f);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_O).is_down()) {
+        spotLightColor[1] = std::max(spotLightColor[1] - 0.02f, 0.0f);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_P).is_down()) {
+        spotLightColor[2] = std::max(spotLightColor[2] - 0.02f, 0.0f);
+    }
+
+    if (platform->key(engine::platform::KeyId::KEY_T).is_down() && !starKeyPressed) {
+        std::thread(&MainController::alter_star, this).detach();
+        starKeyPressed = true;
+    }
+    if (platform->key(engine::platform::KeyId::KEY_T).is_up()) {
+        starKeyPressed = false;
+    }
 }
 
-void MainController::renderQuad() {
-    if (quadVAO == 0) {
-        float quadVertices[] = {
-                // positions        // texture Coords
-                -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-                -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-                1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-                1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
+void MainController::alter_star() {
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    starLuminocity *= 1.5f;
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    starLuminocity /= 1.5f;
 }
