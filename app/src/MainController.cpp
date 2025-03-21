@@ -10,7 +10,6 @@
 #include <future>
 #include <chrono>
 #include <thread>
-#include <libs/glad/include/glad/glad.h>
 #include <spdlog/spdlog.h>
 
 #include "GUIController.hpp"
@@ -66,12 +65,12 @@ void MainController::draw_spaceship() {
     shader->use();
 
     glm::mat4 model = glm::mat4(1.0f);
-    model           = translate(model, csillaPos + glm::vec3(0.1f, 0.2f, 1.4f));
+    model           = translate(model, m_csillaPos + glm::vec3(0.1f, 0.2f, 1.4f));
     model           = scale(model, glm::vec3(0.001f));
     model           = rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->set_mat4("model", model);
 
-    set_rotation(shader, csillaSpeed);
+    set_rotation(shader, m_csillaSpeed);
 
     spaceship->draw(shader);
 }
@@ -99,11 +98,11 @@ void MainController::draw_csilla() {
     shader->use();
 
     glm::mat4 model = glm::mat4(1.0f);
-    model           = translate(model, csillaPos);
+    model           = translate(model, m_csillaPos);
     model           = scale(model, glm::vec3(0.1f));
     shader->set_mat4("model", model);
 
-    set_rotation(shader, csillaSpeed);
+    set_rotation(shader, m_csillaSpeed);
 
     mars->draw(shader);
 }
@@ -116,7 +115,7 @@ void MainController::draw_terran() {
 
     glm::mat4 model = glm::mat4(1.0f);
     model           = translate(model, glm::vec3(4.0f, 0.0f, -2.0f));
-    model           = scale(model, glm::vec3(0.1f));
+    model           = scale(model, glm::vec3(m_terranScale));
     shader->set_mat4("model", model);
 
     set_rotation(shader, 18000);
@@ -134,10 +133,10 @@ void MainController::draw_star() {
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model = glm::mat4(1.0f);
-    model           = translate(model, starPos);
-    model           = scale(model, glm::vec3(starScale));
+    model           = translate(model, m_starPos);
+    model           = scale(model, glm::vec3(0.6f));
     shader->set_mat4("model", model);
-    shader->set_float("luminocity", starLuminocity);
+    shader->set_float("luminocity", m_starLuminocity);
 
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
@@ -157,21 +156,21 @@ void MainController::draw_asteroid() {
 
     set_star_light(shader);
     set_spot_light(shader);
-    set_rotation(shader, csillaSpeed);
+    set_rotation(shader, m_csillaSpeed);
 
     auto platform = get<engine::platform::PlatformController>();
     float angle   = fmod((platform->frame_time().current), 3000) / (3000.0f / 360);
 
-    auto rotation = translate(glm::mat4(1.0f), csillaPos);
+    auto rotation = translate(glm::mat4(1.0f), m_csillaPos);
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-    rotation      = translate(rotation, -csillaPos);
+    rotation      = translate(rotation, -m_csillaPos);
 
     shader->set_mat4("moonRotation", rotation);
 
     auto camera = graphics->camera();
     shader->set_vec3("viewPos", camera->Position);
 
-    engine::graphics::OpenGL::draw_instanced(asteroid, amount);
+    engine::graphics::OpenGL::draw_instanced(asteroid, m_amount);
 }
 
 void MainController::begin_draw() {
@@ -207,7 +206,7 @@ void MainController::end_draw() {
     auto shaderBlur  = resources->shader("blur");
     auto shaderBloom = resources->shader("bloom");
 
-    engine::graphics::OpenGL::end_bloom(shaderBlur, shaderBloom, bloom, exposure);
+    engine::graphics::OpenGL::end_bloom(shaderBlur, shaderBloom, m_bloom, m_exposure);
 
     auto platform = get<engine::platform::PlatformController>();
     platform->swap_buffers();
@@ -244,47 +243,47 @@ void MainController::update_camera() {
     camera->process_mouse_movement(mouse.dx, mouse.dy);
     //camera->process_mouse_scroll(mouse.scroll);
 
-    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
-        bloom           = !bloom;
-        bloomKeyPressed = true;
+    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !m_bloomKeyPressed) {
+        m_bloom           = !m_bloom;
+        m_bloomKeyPressed = true;
         spdlog::info("Bloom switched");
     }
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) {
-        bloomKeyPressed = false;
+        m_bloomKeyPressed = false;
     }
 
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
         spdlog::info("Exposure decreased");
-        if (exposure > 0.0f)
-            exposure -= 0.01f;
+        if (m_exposure > 0.0f)
+            m_exposure -= 0.01f;
         else
-            exposure = 0.0f;
+            m_exposure = 0.0f;
     } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
         spdlog::info("Exposure increased");
-        exposure += 0.01f;
+        m_exposure += 0.01f;
     }
 }
 
 void MainController::initialize_asteroids() {
-    modelMatrices = new glm::mat4[amount];
-    auto platform = get<engine::platform::PlatformController>();
+    m_modelMatrices = new glm::mat4[m_amount];
+    auto platform   = get<engine::platform::PlatformController>();
     srand(static_cast<unsigned int>(platform->frame_time().current)); // initialize random seed
 
     float radius = 1.0;
     float offset = 0.25f;
-    for (unsigned int i = 0; i < amount; i++) {
+    for (unsigned int i = 0; i < m_amount; i++) {
         glm::mat4 model = glm::mat4(1.0f);
-        model           = translate(model, csillaPos);
+        model           = translate(model, m_csillaPos);
 
         // 1. translation: displace along circle with 'radius' in range [-offset, offset]
-        float angle        = (float) i / (float) amount * 360.0f;
+        float angle        = (float) i / (float) m_amount * 360.0f;
         float displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
         float x            = sin(angle) * radius + displacement;
         displacement       = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
         float y            = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
         displacement       = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
         float z            = cos(angle) * radius + displacement;
-        model              = translate(model, glm::vec3(x, y, z));
+        model              = glm::translate(model, glm::vec3(x, y, z));
 
         // 2. scale: Scale between 0.05 and 0.25f
         float scale = static_cast<float>((rand() % 20) / 2000.0 + 0.0025);
@@ -295,14 +294,13 @@ void MainController::initialize_asteroids() {
         model          = rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
 
         // 4. now add to list of matrices
-        modelMatrices[i] = model;
+        m_modelMatrices[i] = model;
     }
 
     auto resources = get<engine::resources::ResourcesController>();
     auto asteroid  = resources->model("asteroid");
 
-    engine::graphics::OpenGL::initialize_instancing(asteroid, modelMatrices, amount);
-
+    engine::graphics::OpenGL::initialize_instancing(asteroid, m_modelMatrices, m_amount);
 }
 
 void MainController::initialize_bloom() {
@@ -329,16 +327,16 @@ void MainController::set_spot_light(engine::resources::Shader *shader) {
     shader->set_vec3("light.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
     // we configure the diffuse intensity slightly higher; the right lighting conditions differ with each lighting method and environment.
     // each environment and lighting type requires some tweaking to get the best out of your environment.
-    shader->set_vec3("light.diffuse", spotLightColor);
-    shader->set_vec3("light.specular", spotLightColor);
+    shader->set_vec3("light.diffuse", m_spotLightColor);
+    shader->set_vec3("light.specular", m_spotLightColor);
     shader->set_float("light.constant", 1.0f);
     shader->set_float("light.linear", 0.35f);
     shader->set_float("light.quadratic", 0.44f);
 }
 
 void MainController::set_star_light(engine::resources::Shader *shader) {
-    shader->set_vec3("lightPos", starPos);
-    shader->set_vec3("lightColor", starColor);
+    shader->set_vec3("lightPos", m_starPos);
+    shader->set_vec3("lightColor", m_starColor);
 }
 
 void MainController::set_rotation(engine::resources::Shader *shader, int speed) {
@@ -346,11 +344,12 @@ void MainController::set_rotation(engine::resources::Shader *shader, int speed) 
 
     float angle = fmod((platform->frame_time().current), speed) / (speed / 360.0);
 
-    auto rotation = translate(glm::mat4(1.0f), starPos);
+    auto rotation = translate(glm::mat4(1.0f), m_starPos);
     rotation      = rotate(rotation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-    rotation      = translate(rotation, -starPos);
+    rotation      = translate(rotation, -m_starPos);
 
     shader->set_mat4("starRotation", rotation);
+    //shader->set_mat4("starRotation", glm::mat4(1.0f));
 }
 
 void MainController::poll_events() {
@@ -360,54 +359,58 @@ void MainController::poll_events() {
         platform->set_enable_cursor(cursor_enabled);
     }
 
-    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !bloomKeyPressed) {
-        bloom           = !bloom;
-        bloomKeyPressed = true;
+    if (platform->key(engine::platform::KeyId::KEY_SPACE).is_down() && !m_bloomKeyPressed) {
+        m_bloom           = !m_bloom;
+        m_bloomKeyPressed = true;
     }
     if (platform->key(engine::platform::KeyId::KEY_SPACE).is_up()) {
-        bloomKeyPressed = false;
+        m_bloomKeyPressed = false;
     }
 
     if (platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
-        if (exposure > 0.0f)
-            exposure -= 0.001f;
+        if (m_exposure > 0.0f)
+            m_exposure -= 0.001f;
         else
-            exposure = 0.0f;
-    } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
-        exposure += 0.001f;
-    }
+            m_exposure = 0.0f;
+    } else
+        if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
+            m_exposure += 0.001f;
+        }
 
     if (platform->key(engine::platform::KeyId::KEY_J).is_down()) {
-        spotLightColor[0] += 0.02f;
+        m_spotLightColor[0] += 0.02f;
     }
     if (platform->key(engine::platform::KeyId::KEY_K).is_down()) {
-        spotLightColor[1] += 0.02f;
+        m_spotLightColor[1] += 0.02f;
     }
     if (platform->key(engine::platform::KeyId::KEY_L).is_down()) {
-        spotLightColor[2] += 0.02f;
+        m_spotLightColor[2] += 0.02f;
     }
     if (platform->key(engine::platform::KeyId::KEY_I).is_down()) {
-        spotLightColor[0] = std::max(spotLightColor[0] - 0.02f, 0.0f);
+        m_spotLightColor[0] = std::max(m_spotLightColor[0] - 0.02f, 0.0f);
     }
     if (platform->key(engine::platform::KeyId::KEY_O).is_down()) {
-        spotLightColor[1] = std::max(spotLightColor[1] - 0.02f, 0.0f);
+        m_spotLightColor[1] = std::max(m_spotLightColor[1] - 0.02f, 0.0f);
     }
     if (platform->key(engine::platform::KeyId::KEY_P).is_down()) {
-        spotLightColor[2] = std::max(spotLightColor[2] - 0.02f, 0.0f);
+        m_spotLightColor[2] = std::max(m_spotLightColor[2] - 0.02f, 0.0f);
     }
 
-    if (platform->key(engine::platform::KeyId::KEY_T).is_down() && !starKeyPressed) {
+    if (platform->key(engine::platform::KeyId::KEY_T).is_down() && !m_starKeyPressed) {
         std::thread(&MainController::alter_star, this).detach();
-        starKeyPressed = true;
+        m_starKeyPressed = true;
     }
     if (platform->key(engine::platform::KeyId::KEY_T).is_up()) {
-        starKeyPressed = false;
+        m_starKeyPressed = false;
     }
 }
 
 void MainController::alter_star() {
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    starLuminocity *= 1.5f;
+    m_starLuminocity *= 1.5f;
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    starLuminocity /= 1.5f;
+    m_starLuminocity /= 1.5f;
+    m_terranScale *= 2.0f;
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    m_terranScale /= 2.0f;
 }

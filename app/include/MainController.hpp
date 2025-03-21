@@ -60,23 +60,23 @@ private:
 
     void alter_star();
 
-    unsigned int amount      = 2000;
-    glm::mat4 *modelMatrices = nullptr;
+    unsigned int m_amount      = 2000;
+    glm::mat4 *m_modelMatrices = nullptr;
 
-    glm::vec3 starPos   = glm::vec3(-5.0f, 0.0f, -8.0f);
-    glm::vec3 starColor = glm::vec3(1.0f, 0.9f, 0.6f);
+    glm::vec3 m_starPos   = glm::vec3(-5.0f, 0.0f, -8.0f);
+    glm::vec3 m_starColor = glm::vec3(1.0f, 0.9f, 0.6f);
 
-    glm::vec3 csillaPos = glm::vec3(0.5f, 0.0f, -1.0f);
-    int csillaSpeed     = 10000;
+    glm::vec3 m_csillaPos = glm::vec3(0.5f, 0.0f, -1.0f);
+    int m_csillaSpeed     = 10000;
 
-    bool bloom           = true;
-    bool bloomKeyPressed = false;
-    float exposure       = 1.5f;
+    bool m_bloom           = true;
+    bool m_bloomKeyPressed = false;
+    float m_exposure       = 1.5f;
 
-    glm::vec3 spotLightColor = glm::vec3(0.7f, 0.7f, 0.7f);
-    float starScale          = 0.6f;
-    float starLuminocity     = 1.8f;
-    bool starKeyPressed      = false;
+    glm::vec3 m_spotLightColor = glm::vec3(0.7f, 0.7f, 0.7f);
+    float m_terranScale        = 0.1f;
+    float m_starLuminocity     = 1.8f;
+    bool m_starKeyPressed      = false;
 };
 
 #endif //MAINCONTROLLER_HPP
